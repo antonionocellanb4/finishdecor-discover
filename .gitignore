@@ -1,0 +1,7 @@
+# La chiave Gemini non deve mai finire nel repo
+.env
+.env.*
+!.env.example
+node_modules/
+.DS_Store
+Thumbs.db
