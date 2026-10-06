@@ -1,12 +1,12 @@
 // POST /api/room
-//   { mode: 'generate', choices, walls }  → a living room built from the visitor's choices
-//   { mode: 'edit', image, walls }        → the same picture with only the walls repainted
+//   { mode: 'scene', scene: 0|1|2, typology, palette, choices } → one of three spaces of the visitor's type, in that palette
+//   { mode: 'moodboard', typology, palette, choices }         → a flat lay of samples in that palette
 // Answers { image: 'data:image/...;base64,...' }.
 //
-// Edits always start from the ORIGINAL generated room (the page sends it), not
-// from the last edit: repainting a repaint drifts a little more every time.
+// The page asks for four pictures per chosen palette (scenes 0–2 and the
+// moodboard) while the AI screen reads the choices, and shows them in the proposal.
 
-import { gemini, imageOut, dataUrlParts, checkWalls, clean, send, mockImage, sleep, HttpError, IMAGE_MODEL, MOCK } from './_gemini.js';
+import { gemini, imageOut, checkPalette, checkTipo, clean, send, mockImage, sleep, HttpError, IMAGE_MODEL, MOCK, TIPI } from './_gemini.js';
 
 // What each colour language looks like, said in the words an image model knows
 const STYLE = {
@@ -19,44 +19,45 @@ const STYLE = {
   Materico: 'lime plaster, travertine, raw stone and textured surfaces',
 };
 
-function generatePrompt(choices, w) {
+function style(choices) {
   const langs = (choices?.languages || []).slice(0, 3).map(l => clean(l.name, 20)).filter(n => STYLE[n]);
+  return langs.map(n => STYLE[n]).join('; ') || STYLE.Neutro;
+}
+const colours = pal => pal.map(c => `${c.name} (${c.hex})`).join(', ');
+
+function scenePrompt(tipo, scene, pal, choices) {
   const loved = (choices?.loved || []).slice(0, 8).map(l => clean(l.title, 40)).filter(Boolean);
-  const approaches = (choices?.approaches || []).slice(0, 3).map(a => clean(a, 20)).filter(Boolean);
   return [
-    'Photorealistic interior photograph of a living room, eye-level, natural daylight, interior design magazine quality.',
-    `Style: ${langs.map(n => STYLE[n]).join('; ') || STYLE.Neutro}.`,
-    loved.length ? `The visitor was drawn to images titled (Italian): ${loved.join(', ')}.` : '',
-    approaches.length ? `Colour approaches they feel close to: ${approaches.join(', ')}.` : '',
-    `Large, clearly visible wall surfaces. The back wall is painted ${w.back.name} (${w.back.hex}), the side walls ${w.side.name} (${w.side.hex}), flat matte interior paint.`,
+    `Photorealistic interior photograph of ${TIPI[tipo].scenes[scene]}, natural light, interior design magazine quality.`,
+    `Style: ${style(choices)}.`,
+    loved.length ? `The client was drawn to spaces described (in Italian) as: ${loved.join(', ')}.` : '',
+    `Colour scheme taken strictly from this paint palette: ${colours(pal)}.`,
+    `The main walls are painted ${pal[0].name} (${pal[0].hex}); the other colours go on an accent wall, joinery, textiles and details. Matte interior paint and decorative wall finishes, clearly visible.`,
     'No people, no text, no logos, no watermarks.',
   ].filter(Boolean).join(' ');
 }
 
-function editPrompt(w) {
+function moodboardPrompt(tipo, pal, choices) {
   return [
-    'Edit this photograph: repaint ONLY the wall surfaces.',
-    `Back wall: ${w.back.name} (${w.back.hex}). Side walls: ${w.side.name} (${w.side.hex}).`,
-    'Flat matte interior paint; keep the original light, shadows and reflections falling on the walls.',
-    'Do not change furniture, floor, ceiling, decor, plants, art, camera angle, framing or lighting.',
-    'Return the same photograph with only the wall colours changed.',
+    'Interior design moodboard: a tidy flat lay photographed from directly above on a plain light board.',
+    `Painted colour sample cards in exactly these colours: ${colours(pal)}.`,
+    `With material samples for ${TIPI[tipo].scenes[0]} in this style: ${style(choices)} (for example wood, stone, plaster, fabric), and one small natural element.`,
+    'Soft daylight, realistic photograph. No text, no labels, no logos, no watermarks.',
   ].join(' ');
 }
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return send(res, 405, { error: 'Usa POST' });
   try {
-    const { mode, choices, walls, image } = req.body || {};
-    const w = checkWalls(walls);
-    if (mode !== 'generate' && mode !== 'edit') throw new HttpError(400, 'mode deve essere generate o edit');
-    if (MOCK) { await sleep(mode === 'generate' ? 2500 : 1500); return send(res, 200, { image: await mockImage(), mock: true }); }
+    const { mode, scene, typology, palette, choices } = req.body || {};
+    if (mode !== 'scene' && mode !== 'moodboard') throw new HttpError(400, 'mode deve essere scene o moodboard');
+    const tipo = checkTipo(typology), pal = checkPalette(palette), sc = [0, 1, 2].includes(scene) ? scene : 0;
+    if (MOCK) { await sleep(2500 + Math.random() * 3000); return send(res, 200, { image: await mockImage(), mock: true }); }
 
-    const parts = mode === 'generate'
-      ? [{ text: generatePrompt(choices, w) }]
-      : [{ inlineData: dataUrlParts(image) }, { text: editPrompt(w) }];
     const json = await gemini(IMAGE_MODEL, {
-      contents: [{ role: 'user', parts }],
-      generationConfig: { responseModalities: ['IMAGE'], ...(mode === 'generate' && { imageConfig: { aspectRatio: '4:3' } }) },
+      contents: [{ role: 'user', parts: [{ text: mode === 'scene' ? scenePrompt(tipo, sc, pal, choices) : moodboardPrompt(tipo, pal, choices) }] }],
+      // the page shows the first space and the moodboard wide, the other two spaces square
+      generationConfig: { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: mode === 'moodboard' || sc === 0 ? '4:3' : '1:1' } },
     });
     send(res, 200, { image: imageOut(json) });
   } catch (e) {

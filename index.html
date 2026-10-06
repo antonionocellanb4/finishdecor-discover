@@ -82,6 +82,8 @@ a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;border:0;background:transparent;-webkit-tap-highlight-color:transparent;cursor:pointer}
 img{display:block}
 [hidden]{display:none!important}
+/* scrollbars: thin, in the app's greys, no arrow buttons */
+*{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.2) transparent}
 
 /* ── 9:16 VERTICAL CONTAINER — same ground as the trend globe ── */
 .frame{
@@ -162,6 +164,7 @@ img{display:block}
 }
 .btn-quiet:active{transform:scale(0.98)}
 .actions{flex:0 0 auto;display:flex;gap:0.5rem;margin-top:0.75rem}
+.actions .btn-quiet+.btn-primary{flex:1 1 0;width:auto;min-width:0}
 
 /* ── INTRO / ATTRACT ──
    Copied from the reference the client picked: a few large rounded interior
@@ -205,24 +208,12 @@ img{display:block}
   -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 32%);
   mask-image:linear-gradient(to bottom,transparent 0%,#000 32%);
 }
+/* the same warm light, quieter, behind the glass palette cards */
+.intro-glow.soft{opacity:0.45}
 .intro-meta,.intro-text,.intro-kicker{text-shadow:0 1px 12px rgba(0,0,0,0.28)}
-/* tiny vertical mono labels, as in the reference */
-/* anchored above the copy, so on any screen they sit in the faded photos, never beside the title */
-.intro-tags{position:absolute;left:-0.75rem;bottom:calc(100% + 1.25rem);display:flex;flex-direction:column;gap:1.25rem}
-.intro-tag{
-  writing-mode:vertical-rl;transform:rotate(180deg);
-  font:500 0.6875rem/1 ui-monospace,'SFMono-Regular',Consolas,monospace;letter-spacing:0.22em;
-  color:rgba(255,255,255,0.42);
-}
 .intro-copy{position:relative;z-index:1}
 .intro-kicker{font-size:1.125rem;font-weight:300;color:rgba(255,255,255,0.78)}
-.intro-title{font-size:2.75rem;font-weight:300;line-height:1.1;letter-spacing:-0.04em;margin-top:0.375rem}
-.intro-title b{font-weight:600}
-/* the empty capsules of the reference, filled with paint: here they mean something */
-.intro-title .sw{
-  display:inline-block;width:1.4em;height:0.6em;border-radius:999px;vertical-align:0.1em;margin:0 0.06em;
-  border:1.5px solid rgba(255,255,255,0.6);
-}
+.intro-title{font-size:3.25rem;font-weight:300;line-height:1.08;letter-spacing:-0.04em;margin-top:0.375rem;text-wrap:balance}
 .intro-text{font-size:1rem;line-height:1.5;color:rgba(255,255,255,0.8);margin-top:0.875rem;max-width:20rem}
 .intro-cta-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:2rem}
 .intro-meta{font-size:0.875rem;color:rgba(255,255,255,0.75)}
@@ -403,73 +394,6 @@ img{display:block}
 .ab-opt.chosen .ab-letter{background:#fff;color:#1d1d1d;border-color:#fff}
 .ab-opt.dimmed{opacity:0.3}
 
-/* ── STEP 3: COLOUR SIMULATION ── */
-.room{
-  flex:1 1 auto;min-height:0;overflow:hidden;border-radius:2rem;
-  background:var(--surface);position:relative;
-}
-.room canvas,.r-room canvas{width:100%;height:100%;display:block;object-fit:cover;object-position:50% 40%}
-.room-note{
-  position:absolute;left:1rem;bottom:1rem;
-  padding:0.3125rem 0.6875rem;border-radius:999px;
-  background:rgba(22,22,24,0.94);font-size:0.8125rem;font-weight:500;color:var(--label-2);
-}
-.controls{
-  flex:0 0 auto;margin-top:0.75rem;padding:0.75rem;
-  background:var(--block);border:1px solid var(--block-line);border-radius:var(--r-card);
-  display:flex;flex-direction:column;gap:0.75rem;
-}
-.ctl-label{display:flex;justify-content:space-between;font-size:0.8125rem;font-weight:500;color:var(--label-3);margin-bottom:0.375rem}
-.chips{display:flex;gap:0.375rem;overflow-x:auto;scrollbar-width:none;margin:0 -0.75rem;padding:0 0.75rem}
-.chips::-webkit-scrollbar{display:none}
-.chip{
-  flex:0 0 auto;display:inline-flex;align-items:center;gap:0.4375rem;
-  min-height:2.5rem;padding:0 0.8125rem 0 0.5625rem;border-radius:999px;
-  background:var(--fill);font-size:0.9375rem;font-weight:500;white-space:nowrap;
-  transition:background .18s,color .18s;
-}
-.chip[aria-pressed="true"]{background:var(--tint);color:var(--on-tint)}
-.seg{display:flex;padding:0.25rem;gap:0.25rem;border-radius:999px;background:var(--fill)}
-.seg button{
-  flex:1 1 0;min-height:2.375rem;border-radius:999px;
-  font-size:0.875rem;font-weight:500;color:var(--label-2);white-space:nowrap;
-  transition:background .18s,color .18s;
-}
-.seg button[aria-pressed="true"]{background:var(--tint);color:var(--on-tint)}
-/* Range with a thumb big enough for a finger on a wall-mounted screen */
-.range{
-  -webkit-appearance:none;appearance:none;width:100%;height:2rem;background:transparent;
-  --v:50%;
-}
-.range::-webkit-slider-runnable-track{height:0.375rem;border-radius:3px;background:linear-gradient(to right,var(--tint) var(--v),var(--fill) var(--v))}
-.range::-moz-range-track{height:0.375rem;border-radius:3px;background:linear-gradient(to right,var(--tint) var(--v),var(--fill) var(--v))}
-.range::-webkit-slider-thumb{
-  -webkit-appearance:none;width:1.625rem;height:1.625rem;margin-top:-0.625rem;border-radius:50%;
-  background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.5);border:0;
-}
-.range::-moz-range-thumb{width:1.625rem;height:1.625rem;border-radius:50%;background:#fff;border:0;box-shadow:0 2px 8px rgba(0,0,0,0.5)}
-.range:focus-visible{outline:2px solid var(--tint);outline-offset:2px;border-radius:4px}
-.ctl-pair{display:grid;grid-template-columns:1fr 1fr;gap:0.875rem}
-.ctl-label b{font-weight:500;color:var(--label-2)}
-/* the AI room sits over the local photo; the local one shows whenever the AI is off */
-.ai-room{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;transition:opacity .6s}
-.room-note{z-index:2}
-.ai-busy{
-  position:absolute;z-index:3;top:1rem;left:50%;transform:translateX(-50%);max-width:calc(100% - 2rem);
-  display:flex;align-items:center;gap:0.5rem;padding:0.4375rem 0.875rem;border-radius:999px;
-  background:rgba(18,18,18,0.8);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
-  font-size:0.8125rem;color:var(--label);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.ai-busy:not(.note)::before{
-  content:'';flex:0 0 auto;width:0.75rem;height:0.75rem;border-radius:50%;
-  border:2px solid var(--tint);border-top-color:transparent;animation:ai-spin .8s linear infinite;
-}
-@keyframes ai-spin{to{transform:rotate(360deg)}}
-.versions{position:absolute;z-index:2;right:0.875rem;bottom:0.875rem;display:flex;gap:0.375rem}
-.versions button{width:2.75rem;height:2.75rem;padding:0;border-radius:0.75rem;overflow:hidden;border:2px solid rgba(255,255,255,0.25);transition:border-color .2s}
-.versions button[aria-current="true"]{border-color:#fff}
-.versions img{width:100%;height:100%;object-fit:cover;display:block}
-
 /* ── STEP 4: APPROACHES ── */
 .panel{
   flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
@@ -486,12 +410,50 @@ img{display:block}
 .ap-name,.ap-desc{display:block}
 .ap-name{font-size:1.125rem;font-weight:500}
 .ap-desc{font-size:0.875rem;color:var(--label-2);line-height:1.35}
-.ap svg{
+.ap svg,.pal svg,.brand svg{
   width:1.75rem;height:1.75rem;flex:0 0 auto;padding:0.3125rem;border-radius:50%;
   border:1.5px solid var(--line);color:transparent;transition:background .15s,color .15s,border-color .15s;
 }
-.ap[aria-pressed="true"] svg{background:var(--tint);border-color:var(--tint);color:var(--on-tint)}
+.ap[aria-pressed="true"] svg,.pal[aria-pressed="true"] svg,.brand[aria-pressed="true"] svg{background:var(--tint);border-color:var(--tint);color:var(--on-tint)}
 .ap+.ap{border-top:1px solid var(--separator)}
+/* step 5: one tile per brand, the same card as the palettes, the logo in the middle */
+.brands{flex:1 1 auto;min-height:0;display:grid;grid-auto-rows:1fr;gap:0.75rem}
+.brands.many{grid-template-columns:1fr 1fr}
+.brand{
+  position:relative;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;
+  border-radius:var(--r-card);background:var(--block);border:1px solid var(--block-line);
+  transition:border-color .2s,transform .2s,opacity .3s;
+}
+.brand:active{transform:scale(0.985)}
+.brand img{height:clamp(5rem,24%,9rem);max-width:60%;object-fit:contain}
+.brand-name{font-size:2.25rem;font-weight:300}
+.brand-meta{font-size:0.875rem;color:var(--label-3)}
+.brand svg{position:absolute;top:1rem;right:1rem}
+.brand[aria-pressed="true"]{border-color:var(--tint)}
+.brand.dimmed{opacity:0.3}
+/* step 1: tall cards in a carousel, lined up with the title; the current one outlined in amber */
+.tcar{
+  position:relative;flex:1 1 auto;min-height:0;display:flex;gap:0.875rem;
+  overflow-x:hidden;touch-action:pan-y;scrollbar-width:none;   /* the swipe is handled in JS: a short flick is enough */
+  margin:0 -1rem;padding:0.25rem 1rem;
+}
+.tcar::-webkit-scrollbar{display:none}
+.tcard{
+  flex:0 0 86%;position:relative;overflow:hidden;
+  border-radius:2rem;background:var(--surface);text-align:left;border:1.5px solid transparent;
+  transform:scale(0.92);opacity:0.5;
+  transition:transform .35s cubic-bezier(0.32,0.72,0,1),opacity .35s,border-color .35s;
+}
+.tcard.on{transform:none;opacity:1;border-color:var(--tint)}
+.tcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tcard-cap{position:absolute;left:0;right:0;bottom:0;padding:3rem 1.25rem 1.25rem;background:linear-gradient(to top,rgba(0,0,0,0.8) 10%,transparent)}
+.tcard-name{display:block;font-size:1.75rem;font-weight:300;letter-spacing:-0.02em;line-height:1.15}
+.tcard-sub{display:block;font-size:0.9375rem;color:var(--label-2);margin-top:0.125rem}
+.tcar-foot{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:0.875rem;margin-top:0.875rem}
+.tcar-dots{display:flex;gap:0.375rem}
+.tcar-dots i{width:0.4375rem;height:0.4375rem;border-radius:999px;background:var(--fill);transition:background .3s,width .3s}
+.tcar-dots i.on{width:1.25rem;background:var(--tint)}
+.tcard.dimmed{opacity:0.3}
 
 /* ── STEP 5: AI READING ── */
 .screen-ai{justify-content:center}
@@ -519,6 +481,55 @@ img{display:block}
   animation:rise .5s cubic-bezier(0.32,0.72,0,1);
 }
 .ai-lines li:last-child{color:var(--label)}
+/* step 6: the palettes, big enough to read names and codes from a step back */
+/* the three cards share the screen height: no scrolling on the monitor */
+.pals{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:0.75rem;overflow-y:auto;margin-right:-0.625rem;padding-right:0.625rem}
+.pal{
+  flex:1 0 auto;position:relative;display:flex;flex-direction:column;gap:0.625rem;
+  width:100%;text-align:left;padding:1rem;border-radius:var(--r-card);
+  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  transition:border-color .2s;animation:rise .5s cubic-bezier(0.32,0.72,0,1) backwards;
+}
+.pal[aria-pressed="true"]{border-color:var(--tint)}
+.pal-head{display:flex;align-items:flex-start;gap:0.75rem}
+.pal-body{flex:1 1 auto;min-width:0}
+.pal-name{display:block;font-size:1.25rem;font-weight:500;line-height:1.25}
+.pal-desc{
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  font-size:0.875rem;line-height:1.35;color:var(--label-2);margin-top:0.125rem;
+}
+/* rounded diamonds overlapping, ringed in the card colour, as big as the card allows */
+.pal-sws{flex:1 1 auto;min-height:5.5rem;container-type:size;display:flex;justify-content:center;align-items:center}
+.pal-sws i{flex:0 0 auto;width:min(17cqw,62cqh);aspect-ratio:1;border-radius:28%;transform:rotate(45deg);box-shadow:0 0 0 0.2rem rgba(255,255,255,0.16)}
+.pal-sws i+i{margin-left:calc(min(17cqw,62cqh) * -0.08)}
+/* under them, one dot per colour with name and code: what to ask for at the counter */
+.pal-dots{display:grid;grid-template-columns:repeat(5,1fr);gap:0.25rem;padding:0.5rem 0.5rem 0.4375rem;border-radius:1.25rem;background:rgba(255,255,255,0.06)}
+.pal-dot{display:flex;flex-direction:column;align-items:center;min-width:0;text-align:center}
+.pal-dot i{width:1.5rem;height:1.5rem;border-radius:50%;margin-bottom:0.3125rem;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.18)}
+.pal-dot b{max-width:100%;font-size:0.6875rem;font-weight:500;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pal-dot small{font-size:0.625rem;color:var(--label-3);font-variant-numeric:tabular-nums}
+/* the wait in the showroom: a centred message and the fan deck, no palettes yet */
+#s-pals.center{justify-content:center;text-align:center}
+#s-pals.center .screen-head{margin-bottom:0}
+#s-pals.center .screen-sub{max-width:24rem;margin:0.75rem auto 0}
+/* the way on: a dotted path running right into an amber arrowhead */
+/* the way on: a fan deck in the visitor's colours, opening and closing */
+.fan{position:relative;width:16rem;height:13rem;margin:2.5rem auto 0}
+.fan i{
+  position:absolute;left:calc(50% - 1.5rem);bottom:0;width:3rem;height:12rem;border-radius:0.75rem;
+  transform-origin:50% calc(100% - 1.5rem);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.14),0 0.375rem 1.25rem rgba(0,0,0,0.35);
+  animation:fan 4.8s cubic-bezier(0.45,0,0.25,1) infinite;
+}
+.fan i::after{content:'';position:absolute;left:50%;bottom:1.25rem;width:0.5rem;height:0.5rem;margin-left:-0.25rem;border-radius:50%;background:rgba(0,0,0,0.4)}
+@keyframes fan{0%,10%{transform:rotate(0)}42%,72%{transform:rotate(var(--a))}100%{transform:rotate(0)}}
+.ai-status{display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-top:1.25rem;font-size:0.9375rem;color:var(--label-2);text-align:center}
+.ai-status::before{
+  content:'';flex:0 0 auto;width:0.875rem;height:0.875rem;border-radius:50%;
+  border:2px solid var(--tint);border-top-color:transparent;animation:ai-spin .8s linear infinite;
+}
+@keyframes ai-spin{to{transform:rotate(360deg)}}
 
 /* ── RESULT ── */
 .screen-result{padding-bottom:0}
@@ -527,19 +538,56 @@ img{display:block}
 .r-kicker{font-size:0.875rem;color:var(--label-2)}
 .r-name{font-size:2.25rem;font-weight:300;line-height:1.1;letter-spacing:-0.035em;margin-top:0.25rem}
 .r-desc{font-size:1.0625rem;line-height:1.47;color:var(--label-2);margin-top:0.625rem}
-.r-mix{font-size:0.875rem;color:var(--label-3);margin-top:0.625rem}
+/* the profile as a picture: how the languages add up, then the space and the brand */
+.r-dna{margin-top:1.25rem;padding:1rem;border-radius:var(--r-card);background:var(--block);border:1px solid var(--block-line)}
+.r-dna-h{font-size:0.8125rem;color:var(--label-3);margin-bottom:0.625rem}
+.r-dna-bar{display:flex;gap:3px;height:0.875rem;border-radius:999px;overflow:hidden}
+.r-dna-bar i{display:block;flex:0 0 0;transition:flex-grow 1s cubic-bezier(0.32,0.72,0,1)}
+.r-dna-legend{display:flex;flex-wrap:wrap;gap:0.375rem 1.125rem;margin-top:0.75rem}
+.r-dna-legend span{display:inline-flex;align-items:center;gap:0.4375rem;font-size:0.9375rem;color:var(--label-2)}
+.r-dna-legend b{font-weight:500;color:var(--label)}
+.r-dna-legend i{width:0.625rem;height:0.625rem;border-radius:50%}
+.r-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0.625rem;margin-top:0.625rem}
+.r-fact{
+  position:relative;overflow:hidden;min-height:7rem;padding:0.875rem;border-radius:var(--r-card);
+  background:var(--block);border:1px solid var(--block-line);display:flex;flex-direction:column;justify-content:flex-end;
+}
+.r-fact:only-child{grid-column:span 2}
+.r-fact .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.r-fact.photo::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.78) 15%,transparent 75%)}
+.r-fact .logo{position:absolute;top:0.875rem;left:0.875rem;height:2.25rem;max-width:70%;object-fit:contain;object-position:left}
+.r-fact-k,.r-fact-v{position:relative;z-index:1}
+.r-fact-k{font-size:0.75rem;color:var(--label-2)}
+.r-fact-v{font-size:1.25rem;line-height:1.2}
 .r-section{margin-top:1.75rem}
 .r-h{font-size:1.375rem;font-weight:300;letter-spacing:-0.02em;margin-bottom:0.75rem}
 .r-palette{display:grid;grid-template-columns:repeat(5,1fr);gap:0.375rem}
 .r-sw{height:5.5rem;border-radius:var(--r-control)}
 .r-sw-name{font-size:0.8125rem;font-weight:500;margin-top:0.375rem;line-height:1.2}
 .r-sw-hex{font-size:0.75rem;color:var(--label-3);font-variant-numeric:tabular-nums}
-.r-room{height:17rem;border-radius:2rem;overflow:hidden;background:var(--surface);margin-top:0.5rem;position:relative}
-.mood{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:6.25rem;gap:0.375rem}
-.mood img,.mood .mood-pal{width:100%;height:100%;object-fit:cover;border-radius:var(--r-control);background:var(--surface)}
-.mood>:first-child{grid-column:span 2;grid-row:span 2}
-.mood .mood-pal{grid-row:span 2;display:flex;flex-direction:column;overflow:hidden}
-.mood-pal i{flex:1}
+/* one section per chosen palette */
+.r-pal{margin-top:2rem;padding-top:1.75rem;border-top:1px solid var(--separator)}
+.r-pal-kicker{font-size:0.875rem;color:var(--label-3)}
+.r-pal-name{font-size:1.75rem;font-weight:300;line-height:1.15;letter-spacing:-0.025em;margin-top:0.125rem}
+.r-pal .r-palette{margin-top:1rem}
+.gen-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.375rem;margin:0.75rem 0 1.75rem}
+.gen{position:relative;aspect-ratio:1;overflow:hidden;border-radius:var(--r-card);background:var(--surface)}
+.gen.wide{grid-column:span 2;aspect-ratio:4/3}
+.gen img,.gen-pal{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.gen img{opacity:0;transition:opacity .6s}
+.gen img.in{opacity:1}
+.gen-pal{display:flex;flex-direction:column}
+.gen-pal i{flex:1}
+/* still being drawn by the AI */
+.gen.busy{background:linear-gradient(100deg,var(--surface) 35%,var(--surface-2) 50%,var(--surface) 65%) 0 0/300% 100%;animation:shimmer 1.6s linear infinite}
+@keyframes shimmer{from{background-position:100% 0}to{background-position:0 0}}
+.gen-tag{
+  position:absolute;z-index:1;left:0.625rem;bottom:0.625rem;
+  padding:0.25rem 0.625rem;border-radius:999px;
+  background:rgba(18,18,18,0.8);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  font-size:0.75rem;font-weight:500;color:var(--label-2);
+}
+.gen.busy .gen-tag::after{content:' · in arrivo'}
 .prod{display:flex;gap:0.8125rem;align-items:flex-start;padding:0.8125rem 0;border-bottom:1px solid var(--separator)}
 .prod:last-child{border-bottom:0}
 .prod-sw{width:3rem;height:3rem;flex:0 0 auto;border-radius:var(--r-control)}
@@ -619,7 +667,7 @@ img{display:block}
   .mosaic-col,.ai-swatches i{animation:none}
   .g-move,.g-dot,.g-trail,.card.nudge,.deck-actions.demo .act{animation:none}
   .g-move,.g-dot{opacity:1}
-  .screen,.ai-lines li{animation:none}
+  .screen,.ai-lines li,.pal,.gen.busy,.fan i{animation:none}
 }
 </style>
 </head>
@@ -647,18 +695,27 @@ img{display:block}
     <div class="mosaic" aria-hidden="true"><div class="mosaic-grid" id="mosaic-grid"></div></div>
     <div class="intro-glow" aria-hidden="true"></div>
     <div class="intro-copy">
-      <div class="intro-tags" aria-hidden="true"><span class="intro-tag">FD—2026</span><span class="intro-tag">DISCOVER</span></div>
       <p class="intro-kicker">Benvenuto</p>
-      <h2 class="intro-title">Il tuo <i class="sw" style="background:#EFAE34"></i> stile, prima <i class="sw" style="background:#7F8C5E"></i> ancora del <b>colore</b> <i class="sw" style="background:#C46F45"></i></h2>
-      <p class="intro-text">Tutti si chiedono quale colore scegliere, ma è l'ultima domanda. Partiamo dalla casa che vuoi creare.</p>
+      <h2 class="intro-title">Il tuo stile, prima ancora del colore</h2>
+      <p class="intro-text">Tutti si chiedono quale colore scegliere, ma è l'ultima domanda. Partiamo dallo spazio che vuoi creare.</p>
       <div class="intro-cta-row">
-        <span class="intro-meta">5 fasi · circa 4 minuti</span>
+        <span class="intro-meta">7 fasi · circa 7 minuti</span>
         <button class="go" id="start" type="button">Inizia <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span></button>
       </div>
     </div>
   </section>
 
-  <!-- 1 · ESPLORA -->
+  <!-- 1 · AMBIENTE — the pictures of the whole journey follow this choice -->
+  <section class="screen" id="s-type" hidden>
+    <div class="screen-head">
+      <h2 class="screen-title">Che spazio vuoi creare?</h2>
+      <p class="screen-sub">Le immagini del percorso cambiano in base alla tua scelta.</p>
+    </div>
+    <div class="tcar" id="tcar"></div>
+    <div class="tcar-foot" id="tcar-foot"><div class="tcar-dots" id="tcar-dots" aria-hidden="true"></div><button class="btn-primary" id="tcar-go" type="button"></button></div>
+  </section>
+
+  <!-- 2 · ESPLORA -->
   <section class="screen screen-explore" id="s-explore" hidden>
     <div class="deck" id="deck"></div>
     <div class="deck-bars" id="deck-bars" aria-hidden="true"></div>
@@ -679,43 +736,13 @@ img{display:block}
     </div>
   </section>
 
-  <!-- 2 · A OPPURE B -->
+  <!-- 3 · A OPPURE B -->
   <section class="screen" id="s-ab" hidden>
     <div class="screen-head">
       <h2 class="screen-title" id="ab-q"></h2>
       <p class="screen-sub" id="ab-sub"></p>
     </div>
     <div class="ab" id="ab"></div>
-  </section>
-
-  <!-- 3 · IL COLORE CAMBIA LO SPAZIO -->
-  <section class="screen" id="s-color" hidden>
-    <div class="screen-head">
-      <h2 class="screen-title">Stessa stanza, un'altra casa.</h2>
-      <p class="screen-sub">Il colore cambia lo spazio. Regolalo finché non ti senti a casa.</p>
-    </div>
-    <div class="room" id="room"><img class="ai-room" id="ai-room" alt="Stanza generata dall'AI con le tue preferenze" hidden><span class="ai-busy" id="ai-busy" hidden></span><span class="room-note" id="room-note"></span><div class="versions" id="versions"></div></div>
-    <div class="controls">
-      <div>
-        <div class="ctl-label"><span>Palette</span></div>
-        <div class="chips" id="pal-chips"></div>
-      </div>
-      <div class="ctl-pair">
-        <div>
-          <div class="ctl-label"><span>Saturazione</span><b id="sat-v"></b></div>
-          <input class="range" id="sat" type="range" min="0" max="100" value="50" aria-label="Saturazione">
-        </div>
-        <div>
-          <div class="ctl-label"><span>Contrasto</span><b id="con-v"></b></div>
-          <input class="range" id="con" type="range" min="0" max="100" value="50" aria-label="Contrasto">
-        </div>
-      </div>
-      <div>
-        <div class="ctl-label"><span>Quanto colore</span></div>
-        <div class="seg" id="qty-seg"></div>
-      </div>
-    </div>
-    <div class="actions"><button class="btn-primary" id="color-done" type="button">Così mi piace</button></div>
   </section>
 
   <!-- 4 · IL TUO RAPPORTO CON IL COLORE -->
@@ -728,42 +755,50 @@ img{display:block}
     <div class="actions"><button class="btn-primary" id="ap-done" type="button" disabled>Scegline almeno uno</button></div>
   </section>
 
-  <!-- 5 · L'AI COMPONE IL PROFILO -->
+  <!-- 5 · MARCHIO — the palettes come from its catalogue -->
+  <section class="screen" id="s-brand" hidden>
+    <div class="screen-head">
+      <h2 class="screen-title">Con quale marchio vuoi lavorare?</h2>
+      <p class="screen-sub">Le palette nasceranno dal suo catalogo colori.</p>
+    </div>
+    <div class="brands" id="brand-list"></div>
+  </section>
+
+  <!-- 6 · LE PALETTE — first looked for and touched in the showroom, then chosen -->
+  <section class="screen" id="s-pals" hidden>
+    <div class="intro-glow soft" aria-hidden="true"></div>
+    <div class="screen-head">
+      <h2 class="screen-title" id="pals-title">Le tue palette</h2>
+      <p class="screen-sub" id="pals-sub"></p>
+      <div class="fan" id="fan" aria-hidden="true" hidden></div>
+    </div>
+    <p class="ai-status" id="pals-wait" role="status" hidden>Sto componendo le palette dal catalogo che hai scelto</p>
+    <div class="pals" id="pals" hidden></div>
+    <div class="actions" id="pals-actions" hidden>
+      <button class="btn-quiet" id="pick-all" type="button">Tutte e tre</button>
+      <button class="btn-primary" id="pals-done" type="button" disabled>Scegline almeno una</button>
+    </div>
+  </section>
+
+  <!-- 7 · L'AI LEGGE LE SCELTE E CREA GLI AMBIENTI DELLE PALETTE SCELTE -->
   <section class="screen screen-ai" id="s-ai" hidden>
     <div class="ai-swatches" id="ai-swatches" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
     <h2 class="ai-title" id="ai-title">Sto leggendo le tue scelte</h2>
     <ul class="ai-lines" id="ai-lines" aria-live="polite"></ul>
-    <div class="actions"><button class="btn-primary" id="ai-done" type="button" hidden>Vedi la tua proposta</button></div>
+    <p class="ai-status" id="ai-status" role="status" hidden></p>
+    <div class="actions"><button class="btn-primary" id="ai-done" type="button" hidden>Vedi il tuo progetto</button></div>
   </section>
 
-  <!-- 6 · PROPOSTA PROGETTUALE -->
+  <!-- 8 · PROPOSTA PROGETTUALE -->
   <section class="screen screen-result" id="s-result" hidden>
     <div class="result-scroll" id="result-scroll">
       <p class="r-kicker">Il tuo profilo creativo</p>
       <h2 class="r-name" id="r-name"></h2>
       <p class="r-desc" id="r-desc"></p>
-      <p class="r-mix" id="r-mix"></p>
+      <div class="r-dna" id="r-dna"></div>
+      <div class="r-facts" id="r-facts"></div>
 
-      <div class="r-section">
-        <h3 class="r-h">La tua palette</h3>
-        <div class="r-palette" id="r-palette"></div>
-      </div>
-
-      <div class="r-section">
-        <h3 class="r-h">Il colore nello spazio</h3>
-        <div class="seg" id="alt-seg"></div>
-        <div class="r-room" id="r-room"><img class="ai-room" id="r-ai-room" alt="La tua stanza" hidden></div>
-      </div>
-
-      <div class="r-section">
-        <h3 class="r-h">Moodboard</h3>
-        <div class="mood" id="r-mood"></div>
-      </div>
-
-      <div class="r-section">
-        <h3 class="r-h">Indicazioni di prodotto</h3>
-        <div id="r-prod"></div>
-      </div>
+      <div id="r-pals"></div>
 
       <p class="r-foot">Proposta costruita sulle tue scelte. Portala in showroom: i nostri specialisti la trasformano in campioni reali.</p>
     </div>
@@ -822,8 +857,8 @@ img{display:block}
 <script>
 // ── DATA ──
 // Seven colour languages. Every choice in the journey adds weight to some of
-// them; the two heaviest become the profile. Palettes are in ROLE order:
-// [base, support, accent, depth, detail] — the room simulation relies on it.
+// them; the heaviest become the profile. Palettes are in ROLE order:
+// [base, support, accent, depth, detail] — PRODUCTS' `sw` relies on it.
 const ARCH = {
   neutro:     { label:'Neutro',      noun:'Equilibrio', adj:'neutri',      chip:'Neutra',
                 desc:'Toni che non chiedono attenzione e lasciano parlare luce, forme e oggetti.',
@@ -907,146 +942,226 @@ const IMG = [
   {id:'1560185007-cde436f6a4d0',    cat:'Pranzo',    t:'Legno chiaro e luce',         tags:['caldo','naturale']},
   {id:'1590490360182-c33d57733427', cat:'Hotel',     t:'Classico, luci calde',        tags:['sofisticato','caldo']},
   {id:'1578683010236-d716f9a3f461', cat:'Hotel',     t:'Pietra e vetrate',            tags:['minimale','materico']},
+  // From here on (28–), one block per type of space: 8 for the deck, then the A/B pictures
+  // Casa
+  {id:'1616046229478-9901c5536a45', cat:'Soggiorno', t:'Salvia e piante', d:'Pareti verde salvia, legno e piante: la casa come un giardino.', tags:['naturale','sofisticato']},
+  {id:'1615066390971-03e4e1c36ddf', cat:'Pranzo', t:'Blu profondo e colore', d:'Una parete blu notte e un quadro che accende la tavola.', tags:['audace','sofisticato']},
+  {id:'1650894622076-e09ab837c502', cat:'Bagno', t:'Legno e pietra viva', d:'Rovere e una parete di pietra naturale: il bagno come rifugio.', tags:['materico','caldo']},
+  {id:'1606744824163-985d376605aa', cat:'Soggiorno', t:'Verde bosco e arco', d:'Una nicchia ad arco verde scuro e una poltrona grigia.', tags:['sofisticato','minimale']},
+  {id:'1606744837616-56c9a5c6a6eb', cat:'Ingresso', t:'Scala bianca e ombre', d:'Intonaco bianco e ombre di rami: la luce come materia.', tags:['minimale','materico']},
+  {id:'1567016376408-0226e4d0c1ea', cat:'Casa', t:'Bianco e silenzio', tags:['minimale','neutro']},
+  {id:'1616047006789-b7af5afb8c20', cat:'Casa', t:'Divano arancio e piante', tags:['caldo','naturale','audace']},
+  // Hotel
+  {id:'1505576391880-b3f9d713dc4f', cat:'Corte', t:'Pareti terracotta', d:'Archi, intonaco cotto e piante: il calore del Mediterraneo.', tags:['caldo','materico']},
+  {id:'1649731000184-7ced04998f44', cat:'Hall', t:'Arco e scacchiera', d:'Un arco bianco, pavimento a scacchi e un ritratto: carattere.', tags:['audace','sofisticato']},
+  {id:'1507652313519-d4e9174996dd', cat:'Bagno', t:'Vasca tra le piante', d:'Pietra, palme e una vasca libera: la spa in camera.', tags:['naturale','materico']},
+  {id:'1496417263034-38ec4f0b665a', cat:'Camera', t:'Blu notte', d:'Pareti blu profondo e lino bianco: il buio che riposa.', tags:['sofisticato','minimale']},
+  {id:'1660557989725-f511e9fa6267', cat:'Lounge', t:'Curve e accenti ocra', d:'Divano avvolgente, cuscini ocra e luce calda.', tags:['sofisticato','audace']},
+  {id:'1656355930756-4f3052af838c', cat:'Camera', t:'Bianco e luce', d:'Tende leggere, una pianta, nient\'altro.', tags:['minimale','naturale']},
+  {id:'1549638441-b787d2e11f14', cat:'Hotel', t:'Bianca e luminosa', tags:['minimale','neutro']},
+  {id:'1592229505726-ca121723b8ef', cat:'Hotel', t:'Classica, rosso e cornici', tags:['sofisticato','caldo']},
+  {id:'1718894070114-6de0e98449a2', cat:'Hotel', t:'Bianco e vetro', tags:['minimale','neutro']},
+  {id:'1765745518673-b562b7304a53', cat:'Hotel', t:'Marmo scuro e legno', tags:['materico','sofisticato']},
+  {id:'1656533391146-dad89b5a8b40', cat:'Hotel', t:'Serra e piante', tags:['naturale','caldo']},
+  {id:'1692153142524-60285a93c249', cat:'Hotel', t:'Verde petrolio e ottone', tags:['sofisticato','audace']},
+  {id:'1584132967334-10e028bd69f7', cat:'Hotel', t:'Sul mare', tags:['naturale','minimale']},
+  {id:'1683914791856-040e5de792b3', cat:'Hotel', t:'Muro rosa', tags:['audace','caldo']},
+  {id:'1562438668-bcf0ca6578f0', cat:'Hotel', t:'Grigio e geometria', tags:['minimale','neutro']},
+  {id:'1731336478850-6bce7235e320', cat:'Hotel', t:'Legno scolpito', tags:['materico','caldo']},
+  // Ristorante
+  {id:'1613274554329-70f997f5789f', cat:'Sala', t:'Rattan e luce naturale', d:'Lampade in fibra, tavoli chiari e piante: una sala che respira.', tags:['naturale','neutro']},
+  {id:'1636405189493-181ecf851006', cat:'Sala', t:'Ulivo e pietra luminosa', d:'Un albero vero al centro e una parete di pietra retroilluminata.', tags:['materico','naturale']},
+  {id:'1583354608715-177553a4035e', cat:'Bistrot', t:'Velluto blu e legno', d:'Divanetti in velluto e luce bassa: intimità da bistrot.', tags:['sofisticato','audace']},
+  {id:'1609534655988-3f5225c13553', cat:'Sala', t:'Petrolio e arancio', d:'Pareti scure e sedute arancio: un contrasto che si ricorda.', tags:['audace','caldo']},
+  {id:'1650490632010-e18cbb694dd1', cat:'Sala', t:'Intonaco e fibra', d:'Pareti materiche, una lampada in fibra e luce radente.', tags:['minimale','materico']},
+  {id:'1582970552008-ac972035ba25', cat:'Sala', t:'Bordeaux e ritratti', d:'Pareti bordeaux, legno e quadri: il fascino della sala storica.', tags:['sofisticato','caldo']},
+  {id:'1784126689317-b52e6cc2e60f', cat:'Bistrot', t:'Arancio bruciato', d:'Una parete arancio e sedute rosse: calore senza mezze misure.', tags:['caldo','audace']},
+  {id:'1550966871-3ed3cdb5ed0c', cat:'Ristorante', t:'Tovaglie bianche e luce', tags:['neutro','minimale']},
+  {id:'1552960226-639240203497', cat:'Ristorante', t:'Rosso scuro e penombra', tags:['sofisticato','audace']},
+  {id:'1665186898214-3881adcc0e15', cat:'Ristorante', t:'Piastrelle bianche', tags:['neutro','minimale']},
+  {id:'1704383014623-a6630096ff8c', cat:'Ristorante', t:'Verde scuro e marmo', tags:['sofisticato','materico']},
+  {id:'1567880905822-56f8e06fe630', cat:'Ristorante', t:'Bianco e archi', tags:['minimale','neutro']},
+  {id:'1538333581680-29dd4752ddf2', cat:'Ristorante', t:'Legno e cementine', tags:['caldo','naturale']},
+  {id:'1631615535272-1106aa1b3854', cat:'Ristorante', t:'Luci sospese e legno scuro', tags:['sofisticato','caldo']},
+  {id:'1600353565737-2427a1ba3d3a', cat:'Ristorante', t:'Loft bianco e piante', tags:['naturale','minimale']},
+  {id:'1633082559031-da8af4abdcf9', cat:'Ristorante', t:'Legno chiaro e vista', tags:['naturale','minimale']},
+  {id:'1651440204216-548382747b40', cat:'Ristorante', t:'Grigio e rosa cipria', tags:['minimale','sofisticato']},
+  {id:'1712630514718-3830cc6c0d0a', cat:'Ristorante', t:'Legno scuro e calore', tags:['materico','caldo']},
+  // Negozio
+  {id:'1769107805465-bfd41863f1a0', cat:'Boutique', t:'Lino e cemento', d:'Capi naturali, un cactus e una colonna grezza.', tags:['naturale','neutro']},
+  {id:'1723663123120-6d47b4fac665', cat:'Concept store', t:'Legno e luce', d:'Mensole in legno illuminate: il prodotto come in galleria.', tags:['caldo','minimale']},
+  {id:'1782177388316-7546da332c3a', cat:'Bottega', t:'Cassetti in legno', d:'Un bancone di cassetti e il verde alle vetrate.', tags:['naturale','caldo']},
+  {id:'1777136977034-71cbc026c9b1', cat:'Boutique', t:'Nicchie avorio', d:'Forme morbide scavate nella parete: l\'espositore è architettura.', tags:['minimale','sofisticato']},
+  {id:'1763059010400-daa7c268b53e', cat:'Showroom', t:'Teak e un grande quadro', d:'Legno anni Sessanta e un dipinto che riempie la parete.', tags:['audace','caldo']},
+  {id:'1765568691251-07bdb8bcd935', cat:'Concept store', t:'Intonaco scolpito', d:'Pareti curve in intonaco: un negozio come una grotta chiara.', tags:['materico','minimale']},
+  {id:'1667746213225-431db3ed8d13', cat:'Concept store', t:'Nastri di legno', d:'Lamelle di legno che avvolgono lo spazio.', tags:['naturale','materico']},
+  {id:'1716829125638-b15e0583b03f', cat:'Showroom', t:'Lampade e specchi', d:'Specchi, lampade e pareti rosa: il negozio come un salotto.', tags:['sofisticato','audace']},
+  {id:'1769107805412-90d9191d53e9', cat:'Negozio', t:'Bianco e mensole', tags:['minimale','neutro']},
+  {id:'1777628530456-bb93d3a03faf', cat:'Negozio', t:'Legno e stampe', tags:['caldo','audace']},
+  {id:'1528698827591-e19ccd7bc23d', cat:'Negozio', t:'Blu e lanterne', tags:['audace','sofisticato']},
+  {id:'1604867708678-dad657e961ce', cat:'Negozio', t:'Crema e fiori secchi', tags:['neutro','naturale']},
+  {id:'1477901492169-d59e6428fc90', cat:'Negozio', t:'Mattoni bianchi e tessuti', tags:['naturale','neutro']},
+  {id:'1777195595983-d9efde4c1223', cat:'Negozio', t:'Legno scuro e libri', tags:['sofisticato','materico']},
+  {id:'1687180498602-5a1046defaa4', cat:'Negozio', t:'Legno e pelle', tags:['caldo','sofisticato']},
+  {id:'1781156216069-f51d03f20e4f', cat:'Negozio', t:'Vetro e cemento', tags:['minimale','materico']},
+  {id:'1564227502985-91742d806cff', cat:'Negozio', t:'Piante e artigianato', tags:['naturale','caldo']},
+  {id:'1764795850238-7a024db5e3ee', cat:'Negozio', t:'Sfere di luce', tags:['sofisticato','audace']},
+  {id:'1546213290-e1b492ab3eee', cat:'Negozio', t:'Cornici in legno chiaro', tags:['minimale','naturale']},
+  {id:'1753029226995-74b05a344bb1', cat:'Negozio', t:'Mattoni e lanterna', tags:['materico','caldo']},
+  // Ufficio
+  {id:'1706074797611-a02f9ed06439', cat:'Lounge', t:'Piante e terracotta', d:'Un giardino verticale e divani color cotto tra le vetrate.', tags:['naturale','audace']},
+  {id:'1781888696976-5b80e29d5040', cat:'Studio', t:'Bianco e cuoio', d:'Poltrone cognac e mensole chiare: un ufficio che accoglie.', tags:['caldo','neutro']},
+  {id:'1600494603989-9650cf6ddd3d', cat:'Studio', t:'Verde bosco', d:'Pareti verde profondo e legno: concentrazione e calma.', tags:['naturale','sofisticato']},
+  {id:'1604328698692-f76ea9498e76', cat:'Open space', t:'Rovere e piante', d:'Pavimento in rovere, vetrate e verde ovunque.', tags:['naturale','minimale']},
+  {id:'1614070776241-fb47cec38278', cat:'Lounge', t:'Giallo e cerchi di luce', d:'Poltrone gialle e lampade ad anello: energia in pausa.', tags:['audace']},
+  {id:'1704655295066-681e61ecca6b', cat:'Direzione', t:'Noce e pelle chiara', d:'Legno scuro, una poltrona avorio e un\'orchidea: la rappresentanza.', tags:['sofisticato','materico']},
+  {id:'1497366412874-3415097a27e7', cat:'Corridoio', t:'Vetro e cemento', d:'Partizioni nere, cemento e una sola lampada: il necessario.', tags:['minimale','materico']},
+  {id:'1785423832602-53aa5bfd6cd6', cat:'Studio', t:'Tappeti e legno vissuto', d:'Un tappeto persiano e scrivanie in legno: lavorare come a casa.', tags:['caldo','materico']},
+  {id:'1525896544042-354764aa27e6', cat:'Ufficio', t:'Bianco e cemento', tags:['minimale','neutro']},
+  {id:'1547586696-ea22b4d4235d', cat:'Ufficio', t:'Legno e finestra sul verde', tags:['naturale','caldo']},
+  {id:'1758711516684-e7a87556015e', cat:'Ufficio', t:'Bianco e arancio', tags:['audace','minimale']},
+  {id:'1764810815228-b7f9432eec5c', cat:'Ufficio', t:'Boiserie in legno', tags:['caldo','materico']},
+  {id:'1715593949273-09009558300a', cat:'Ufficio', t:'Bianco scultoreo', tags:['minimale','neutro']},
+  {id:'1767786330387-5cef0327b6c1', cat:'Ufficio', t:'Petrolio e noce', tags:['sofisticato','audace']},
+  {id:'1646153114001-495dfb56506d', cat:'Ufficio', t:'Piante e luce', tags:['naturale','neutro']},
+  {id:'1531973576160-7125cd663d86', cat:'Ufficio', t:'Soffitto industriale', tags:['materico','minimale']},
+  {id:'1524758631624-e2822e304c36', cat:'Ufficio', t:'Toni chiari e morbidi', tags:['neutro','naturale']},
+  {id:'1774953037913-af0cf688491a', cat:'Ufficio', t:'Legno e penombra', tags:['sofisticato','caldo']},
+  {id:'1518455027359-f3f8164ba6bd', cat:'Ufficio', t:'Bianca e ordinata', tags:['minimale']},
+  {id:'1487017159836-4e23ece2e4cf', cat:'Ufficio', t:'Legno scuro', tags:['materico','sofisticato']},
+  // Business
+  {id:'1686100510540-4c29a46de6e9', cat:'Hall', t:'Curve bianche e piante', d:'Un divano scultoreo e luce zenitale: accoglienza senza rumore.', tags:['minimale','naturale']},
+  {id:'1758448656987-cfae6bf225e4', cat:'Hall', t:'Marmo e oro', d:'Marmi lucidi e lampadari: la rappresentanza classica.', tags:['sofisticato','caldo']},
+  {id:'1758448721205-8465cebc26af', cat:'Reception', t:'Doghe e pietra', d:'Un banco in pietra illuminato davanti a doghe scure.', tags:['materico','caldo']},
+  {id:'1686100510829-e5ba636736b3', cat:'Ingresso', t:'Cemento e ulivo', d:'Calcestruzzo a vista e un albero vero: essenziale e vivo.', tags:['materico','minimale']},
+  {id:'1660557989695-14fac79c086d', cat:'Reception', t:'Marmo nero e ottone', d:'Marmo scuro, carta da parati e luce dorata: un ingresso che si nota.', tags:['sofisticato','audace']},
+  {id:'1759038085950-1234ca8f5fed', cat:'Reception', t:'Parete ocra curva', d:'Una parete dorata che avvolge e marmo chiaro a terra.', tags:['caldo','sofisticato']},
+  {id:'1786175087740-cd110411221d', cat:'Lounge', t:'Divano rosso a onda', d:'Una seduta rossa continua che disegna lo spazio.', tags:['audace']},
+  {id:'1718220268527-4477fd170775', cat:'Atrio', t:'Alberi sotto vetro', d:'Un giardino interno tra le vetrate dell\'atrio.', tags:['naturale']},
+  {id:'1764727291644-5dcb0b1a0375', cat:'Business', t:'Bianco essenziale', tags:['minimale','neutro']},
+  {id:'1758448093806-88b2089068ab', cat:'Business', t:'Legno e pietra', tags:['caldo','materico']},
+  {id:'1788917253799-e59d04b6a5bc', cat:'Business', t:'Poltrone avorio', tags:['sofisticato','neutro']},
+  {id:'1621391309685-3045e5312e61', cat:'Business', t:'Doghe e colori', tags:['audace','caldo']},
+  {id:'1686100510242-2521b6f89a68', cat:'Business', t:'Luce bianca', tags:['minimale','neutro']},
+  {id:'1742844552193-2fd3425cd26d', cat:'Business', t:'Classica, marmo e oro', tags:['sofisticato','caldo']},
+  {id:'1497366811353-6870744d04b2', cat:'Business', t:'Cemento e vetrate', tags:['materico','minimale']},
+  {id:'1766802981831-8baf453bb1ee', cat:'Business', t:'Soffitto in legno', tags:['caldo','naturale']},
+  {id:'1759691554837-be93ac47760b', cat:'Business', t:'Bianco e nero', tags:['minimale']},
+  {id:'1696158773201-b726a0ce6d6e', cat:'Business', t:'Rattan e terracotta', tags:['naturale','caldo']},
+  {id:'1758448511533-e1502259fff6', cat:'Business', t:'Legno e marmo', tags:['caldo','materico']},
+  {id:'1759462692354-404b2c995c99', cat:'Business', t:'Blu e verticali', tags:['audace','sofisticato']},
+  // Wellness
+  {id:'1693578538512-fc66f318c833', cat:'Spa', t:'Legno scuro e cotto', d:'Una cabina in penombra con poltrone color terracotta.', tags:['caldo','sofisticato']},
+  {id:'1729003702131-51807464dcec', cat:'Piscina', t:'Pietra e luce calda', d:'Acqua turchese tra pareti di pietra.', tags:['materico','naturale']},
+  {id:'1761470575018-135c213340eb', cat:'Spa', t:'Nicchia di luce', d:'Pietra scura e candele: il silenzio prende forma.', tags:['sofisticato','materico']},
+  {id:'1776763019060-fa0663574ae6', cat:'Piscina', t:'Vetrate sul giardino', d:'Una vasca lunga che guarda il verde.', tags:['naturale','minimale']},
+  {id:'1617182726501-1f5f7b05a68f', cat:'Piscina', t:'Bianco assoluto', d:'Pareti bianche e luce radente sull\'acqua.', tags:['minimale','neutro']},
+  {id:'1772378452022-94ee7971fe80', cat:'Trattamenti', t:'Arancio e sole', d:'Pareti arancio, legno e piante: un trattamento al sole.', tags:['caldo','audace']},
+  {id:'1616940779493-6958fbd615fe', cat:'Yoga', t:'Luce e piante', d:'Una sala bianca, cuscini a terra e grandi piante.', tags:['naturale','neutro']},
+  {id:'1695527081728-e3a42f0ce261', cat:'Beauty', t:'Parete grafica', d:'Un motivo bianco e nero e il verde delle piante.', tags:['audace','naturale']},
+  {id:'1731336479432-3eb5fdb3ab1c', cat:'Wellness', t:'Pietra e legno caldo', tags:['materico','caldo']},
+  {id:'1676302144341-10563603f99a', cat:'Wellness', t:'Specchio d\'acqua scuro', tags:['sofisticato','minimale']},
+  {id:'1717356495389-6ab1e5ff9d84', cat:'Wellness', t:'Legno chiaro', tags:['naturale','neutro']},
+  {id:'1712659604528-b179a3634560', cat:'Wellness', t:'Legno scuro e brace', tags:['materico','sofisticato']},
+  {id:'1757924284732-4189190321cf', cat:'Wellness', t:'Legno e luce', tags:['naturale','caldo']},
+  {id:'1778828494354-9b717d36dc99', cat:'Wellness', t:'Nero e luci fredde', tags:['audace','sofisticato']},
+  {id:'1687783615494-b4a1f1af8b58', cat:'Wellness', t:'Legno scuro', tags:['caldo','materico']},
+  {id:'1761971975973-cbb3e59263de', cat:'Wellness', t:'Bianco e vetro', tags:['minimale','neutro']},
+  {id:'1695527081827-fdbc4e77be9b', cat:'Wellness', t:'Piastrelle e piante', tags:['naturale','neutro']},
+  {id:'1773904215697-e6c21fc27ac2', cat:'Wellness', t:'Oro e velluto', tags:['sofisticato','audace']},
+  {id:'1630835425197-50feeba99ecd', cat:'Wellness', t:'Cabina bianca', tags:['neutro','minimale']},
+  {id:'1773924093206-9a433a14bb44', cat:'Wellness', t:'Legno e vetrate', tags:['caldo','naturale']},
 ];
-const DECK = [...Array(16).keys()];
-const PAIRS = [
-  {q:'Quale soggiorno senti più tuo?', a:16, b:17},
-  {q:'Dove dormiresti meglio?',        a:18, b:19},
-  {q:'Quale cucina ti somiglia?',      a:20, b:21},
-  {q:'Che bagno vorresti?',            a:22, b:23},
-  {q:'A quale tavola ti siedi?',       a:24, b:25},
-  {q:'In quale hotel torneresti?',     a:26, b:27},
-];
-const QTY = ['Un dettaglio', 'Una parete', 'Tutto'];
-const ALTS = ['Tono su tono', 'Una parete', 'Immersivo'];
-const COLOR_PALS = ['neutro', 'caldo', 'naturale', 'sofisticato', 'audace'];
-const TOTAL = DECK.length + PAIRS.length + 2; // + simulation + approaches
+// The 16 cards of the deck: the 8 pictures of the chosen type of space, each
+// followed by one of these 8 shared inspirations — a style is not made of rooms alone.
+const SHARED = [6, 7, 8, 9, 10, 11, 12, 15];
+// Step 1: the type of space. `own` (its 8 deck pictures) and the pairs' a/b are IMG indices;
+// `spaces` names the three spaces the AI draws, in the order of TIPI.scenes in api/_gemini.js.
+const TYPES = {
+  casa: { label:'Casa', sub:'Soggiorno, camere, cucina, bagno', spaces:['Soggiorno', 'Camera', 'Cucina'], own:[0, 1, 13, 28, 29, 30, 31, 32],
+  pairs:[
+    {q:'Quale soggiorno senti più tuo?', a:16, b:17},
+    {q:'Dove dormiresti meglio?', a:18, b:19},
+    {q:'Quale cucina ti somiglia?', a:20, b:21},
+    {q:'Che bagno vorresti?', a:22, b:23},
+    {q:'A quale tavola ti siedi?', a:24, b:25},
+    {q:'Dove leggeresti un libro?', a:33, b:34}]},
+  hotel: { label:'Hotel', sub:'Camere, hall, bagni, piscine', spaces:['Camera', 'Hall', 'Bagno'], own:[2, 3, 35, 36, 37, 38, 39, 40],
+  pairs:[
+    {q:'In quale camera dormiresti?', a:41, b:42},
+    {q:'Quale bagno ti rilassa?', a:43, b:44},
+    {q:'In quale hotel torneresti?', a:26, b:27},
+    {q:'Dove prendi un aperitivo?', a:45, b:46},
+    {q:'Quale piscina?', a:47, b:48},
+    {q:'Quale suite?', a:49, b:50}]},
+  ristorante: { label:'Ristorante', sub:'Sale, bistrot, bar e caffè', spaces:['Sala', 'Bancone', 'Angolo intimo'], own:[51, 52, 53, 54, 55, 56, 4, 57],
+  pairs:[
+    {q:'In quale sala ti siedi?', a:58, b:59},
+    {q:'Quale bancone ti somiglia?', a:60, b:61},
+    {q:'Dove prendi un caffè?', a:62, b:63},
+    {q:'Quale atmosfera per la sera?', a:64, b:65},
+    {q:'Quale materia senti tua?', a:5, b:66},
+    {q:'Che bistrot vorresti?', a:67, b:68}]},
+  negozio: { label:'Negozio', sub:'Boutique, concept store, showroom', spaces:['Negozio', 'Espositore', 'Camerino'], own:[69, 70, 71, 72, 73, 74, 75, 76],
+  pairs:[
+    {q:'In quale boutique entreresti?', a:77, b:78},
+    {q:'Quale vetrina ti ferma?', a:79, b:80},
+    {q:'Quale espositore?', a:81, b:82},
+    {q:'Quale showroom?', a:83, b:84},
+    {q:'Quale concept store?', a:85, b:86},
+    {q:'Dove proveresti un capo?', a:87, b:88}]},
+  ufficio: { label:'Ufficio', sub:'Postazioni, sale riunioni, studi', spaces:['Open space', 'Sala riunioni', 'Ufficio direzionale'], own:[89, 90, 91, 92, 93, 94, 95, 96],
+  pairs:[
+    {q:'Dove lavoreresti meglio?', a:97, b:98},
+    {q:'Quale sala riunioni?', a:99, b:100},
+    {q:'Quale ufficio direzionale?', a:101, b:102},
+    {q:'Quale open space?', a:103, b:104},
+    {q:'Dove fai una pausa?', a:105, b:106},
+    {q:'Quale scrivania?', a:107, b:108}]},
+  business: { label:'Business', sub:'Hall, reception, spazi di rappresentanza', spaces:['Hall', 'Lounge', 'Sala conferenze'], own:[109, 110, 111, 112, 113, 114, 115, 116],
+  pairs:[
+    {q:'Quale reception accoglie meglio?', a:117, b:118},
+    {q:'Dove aspetteresti un ospite?', a:119, b:120},
+    {q:'Quale hall?', a:121, b:122},
+    {q:'Dove organizzeresti un evento?', a:123, b:124},
+    {q:'Quale sala d\'attesa?', a:125, b:126},
+    {q:'Quale ingresso?', a:127, b:128}]},
+  wellness: { label:'Wellness', sub:'Spa, piscine, palestre, beauty', spaces:['Area relax', 'Piscina', 'Cabina trattamenti'], own:[129, 130, 131, 132, 133, 134, 135, 136],
+  pairs:[
+    {q:'Quale piscina?', a:137, b:138},
+    {q:'Quale sauna?', a:139, b:140},
+    {q:'Dove ti alleneresti?', a:141, b:142},
+    {q:'Quale sala yoga?', a:143, b:144},
+    {q:'Quale salone di bellezza?', a:145, b:146},
+    {q:'Dove ti rilassi?', a:147, b:148}]},
+};
+let DECK = [], PAIRS = [];   // set by setType()
+const TOTAL = 16 + 6 + 3;   // deck + pairs + type, languages, brand
 const IDLE_MS = 120000; // a showroom screen must not keep the last visitor's choices
+
+// The brands' colour catalogues: the same file the server gives the AI, so adding
+// a brand there adds it to the brand step. Opened from file:// it cannot load,
+// and the journey skips the brand step.
+let CAT = null;
+const catReady = import('./data/catalogo.js').then(m => { CAT = m.default; }, () => {});
+const brandName = () => CAT?.marchi[S.brand]?.nome || '';
 
 // ── STATE ──
 let S;
 function fresh() {
   S = { scores:Object.fromEntries(KEYS.map(k => [k, 0])), ab:Object.fromEntries(KEYS.map(k => [k, 0])),
-        liked:[], seenCats:{}, likedCats:{}, deckIdx:0, abIdx:0, sat:50, con:50, qty:1, pal:'neutro',
-        approaches:[], decisions:0, shared:false, touched:false };
+        liked:[], seenCats:{}, likedCats:{}, deckIdx:0, abIdx:0, type:null, brand:null,
+        approaches:[], pals:[], picks:[], prop:null, insights:[], decisions:0, shared:false, touched:false };
 }
 fresh();
+// Steps that wait for an animation before moving on die with the session: a
+// restart in between must not carry the next visitor forward.
+let session = 0;
+const later = (fn, ms) => { const s = session; setTimeout(() => { if (s === session) fn(); }, ms); };
 function add(tags, w, extra) { tags.forEach(k => { S.scores[k] += w; if (extra) extra[k] += w; }); }
 
-// ── COLOUR MATH ──
-function hexToHsl(hex) {
-  const n = parseInt(hex.slice(1), 16);
-  const r = (n >> 16 & 255) / 255, g = (n >> 8 & 255) / 255, b = (n & 255) / 255;
-  const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2;
-  let h = 0, s = 0;
-  if (max !== min) {
-    const d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    h = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
-    h /= 6;
-  }
-  return [h * 360, s * 100, l * 100];
-}
-function hslToHex(h, s, l) {
-  s /= 100; l /= 100;
-  const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l);
-  const f = n => Math.round(255 * (l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1))));
-  return '#' + [f(0), f(8), f(4)].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
-}
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-// sat/con are 0–100 sliders with 50 = the palette as designed
-function tune(hex, sat, con) {
-  const [h, s, l] = hexToHsl(hex);
-  return hslToHex(h, clamp(s * (0.25 + sat / 50 * 0.75), 0, 100), clamp(50 + (l - 50) * (0.6 + con / 100 * 0.8), 4, 97));
-}
-
-// ── ROOM SIMULATION ──
-// A real photo, repainted per pixel. Every pixel gets a weight for how much it
-// is painted wall: inside one of the two wall planes, outside the objects cut
-// out by hand, and neither strongly coloured nor near black. The armchair, TV
-// and furniture weigh 0 and stay exactly as photographed. The new
-// colour is multiplied by the pixel's own brightness, so the photo's light
-// falloff and shadows survive the repaint.
-const ROOM_SRC = 'assets/room.jpg';      // 1400x1235, Unsplash 1586023492125
-const ROOM_W = 1000;                     // working width
-const LREF = 0.82;                       // brightness of the bare wall in the shot
-// Regions in source pixels: [x0, y0, x1, y1]
-const BACK = [275, 0, 1076, 935];        // the wall behind the armchair
-const SIDE = [1076, 0, 1400, 706];       // the plane that steps forward, above the cabinet
-// print, side table top, stone cube, and the brass floor lamp (pole, arm, head)
-const HOLES = [[638, 210, 906, 577], [883, 714, 1034, 740], [930, 880, 1025, 962],
-               [344, 250, 356, 985], [344, 277, 545, 287], [536, 250, 570, 358]];
-const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
-
-const roomImg = new Image();
-const roomReady = new Promise(res => { roomImg.onload = roomImg.onerror = res; });
-roomImg.src = ROOM_SRC;
-let roomData = null;
-function prepRoom() {
-  if (roomData !== null) return roomData;
-  if (!roomImg.naturalWidth) return roomData = false;
-  const k = ROOM_W / roomImg.naturalWidth, w = ROOM_W, h = Math.round(roomImg.naturalHeight * k);
-  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
-  const cx = cv.getContext('2d', { willReadFrequently:true });
-  cx.drawImage(roomImg, 0, 0, w, h);
-  let src;
-  try { src = cx.getImageData(0, 0, w, h).data; } catch { return roomData = false; } // file:// taints the canvas
-  const inR = (x, y, q) => x >= q[0] * k && x < q[2] * k && y >= q[1] * k && y < q[3] * k;
-  const idx = [], wts = [], regs = [], lums = [];
-  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-    const region = inR(x, y, BACK) ? 0 : inR(x, y, SIDE) ? 1 : -1;
-    if (region < 0 || HOLES.some(q => inR(x, y, q))) continue;
-    const p = (y * w + x) * 4, R = src[p], G = src[p + 1], B = src[p + 2];
-    const mx = Math.max(R, G, B), mn = Math.min(R, G, B);
-    // only the strongly coloured (armchair, brass) and the very dark (TV, frame, legs) are
-    // not wall: the lower wall is warm and dim from the floor bounce, but it is still paint
-    const wt = smooth(0.12, 0.25, (mx + mn) / 510) * (1 - smooth(0.35, 0.55, mx ? (mx - mn) / mx : 0));
-    if (wt < 0.02) continue;
-    idx.push(p); wts.push(wt); regs.push(region); lums.push((0.2126 * R + 0.7152 * G + 0.0722 * B) / 255 / LREF);
-  }
-  return roomData = { w, h, src, idx:Uint32Array.from(idx), wt:Float32Array.from(wts), rg:Uint8Array.from(regs), lum:Float32Array.from(lums) };
-}
-// One canvas per place the room appears; colours tween so a change reads as paint drying, not a cut
-function makeRoom(box) {
-  const cv = document.createElement('canvas');
-  cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', 'Soggiorno con le pareti nel colore scelto');
-  box.prepend(cv);
-  let ctx, img, cur, from, to, t0, raf = 0;
-  function render(cols) {
-    const d = roomData, buf = img.data, { src, idx, wt, rg, lum } = d;
-    for (let j = 0; j < idx.length; j++) {
-      const p = idx[j], c = cols[rg[j]], f = lum[j], w = wt[j];
-      buf[p] = src[p] + (c[0] * f - src[p]) * w;
-      buf[p + 1] = src[p + 1] + (c[1] * f - src[p + 1]) * w;
-      buf[p + 2] = src[p + 2] + (c[2] * f - src[p + 2]) * w;
-    }
-    ctx.putImageData(img, 0, 0);
-  }
-  function step(now) {
-    const t = Math.min(1, (now - t0) / 450), e = t * (2 - t);
-    cur = from.map((c, i) => c.map((v, k) => v + (to[i][k] - v) * e));
-    render(cur);
-    raf = t < 1 ? requestAnimationFrame(step) : 0;
-  }
-  return async function paint(back, side) {
-    await roomReady;
-    const d = prepRoom();
-    if (!ctx) {
-      ctx = cv.getContext('2d');
-      cv.width = d ? d.w : roomImg.naturalWidth; cv.height = d ? d.h : roomImg.naturalHeight;
-      if (!d) { ctx.drawImage(roomImg, 0, 0); return; }   // no pixel access: show the photo as is
-      img = ctx.createImageData(d.w, d.h); img.data.set(d.src);
-    }
-    if (!d) return;
-    to = [rgb(back), rgb(side)];
-    if (!cur) { cur = to; render(cur); return; }
-    from = cur; t0 = performance.now();
-    if (!raf) raf = requestAnimationFrame(step);
-  };
-}
-// Which wall gets which palette role — this is what "how much colour" means
-function roomColors(p, qty) { return [[p[0], p[1]], [p[2], p[0]], [p[2], p[2]]][qty]; }
 
 // ── PROFILE ──
 function ranked(scores = S.scores) {
@@ -1055,26 +1170,15 @@ function ranked(scores = S.scores) {
 function profile() {
   const r = ranked();
   const [pk, sk] = [r[0][0], r[1][0]];
-  const P = ARCH[pk].pal, Q = ARCH[sk].pal;
-  // base, accent and depth from the leading language; support and detail from the second
-  const raw = [P[0], Q[1], P[2], P[3], Q[2]];
-  const pal = raw.map(([n, hex]) => [n, tune(hex, S.sat, S.con)]);
   const top = r.slice(0, 3), sum = top.reduce((a, x) => a + x[1], 0) || 1;
-  return { pk, sk, pal, hex:pal.map(x => x[1]), name:`${ARCH[pk].noun} & ${ARCH[sk].noun}`,
+  return { pk, sk, name:`${ARCH[pk].noun} & ${ARCH[sk].noun}`,
            mix:top.map(([k, v]) => `${ARCH[k].label} ${Math.round(v / sum * 100)}%`).join(' · ') };
-}
-function tasteLine() {
-  const sat = S.sat < 35 ? 'Preferisci colori morbidi e smorzati' : S.sat > 65 ? 'Ti piacciono colori pieni e saturi' : 'Ami colori di media intensità';
-  const con = S.con < 35 ? 'contrasti delicati' : S.con > 65 ? 'contrasti netti' : 'contrasti misurati';
-  const qty = ['il colore come dettaglio', 'una parete protagonista', 'ambienti immersi nel colore'][S.qty];
-  return `${sat}, ${con} e ${qty}.`;
 }
 
 // ── TOP BAR ──
 const $ = id => document.getElementById(id);
-// Languages come before the simulation: the AI room is generated while they are chosen
-const STEPS = ['intro', 'explore', 'ab', 'approach', 'color', 'ai', 'result'];
-const PHASE = { explore:'Esplora', ab:'Scegli', color:'Simula', approach:'Linguaggio', ai:'Profilo AI', result:'Il tuo progetto' };
+const STEPS = ['intro', 'type', 'explore', 'ab', 'approach', 'brand', 'pals', 'ai', 'result'];
+const PHASE = { type:'Ambiente', explore:'Esplora', ab:'Scegli', approach:'Linguaggio', brand:'Marchio', pals:'Palette', ai:'Il progetto', result:'Il tuo progetto' };
 let step = 'intro';
 
 function updateProfilePill() {
@@ -1092,12 +1196,12 @@ function go(next) {
   document.querySelector('.topbar').hidden = next === 'intro'; // the attract screen is all picture
   $('phase-row').hidden = next === 'intro';
   $('restart').hidden = next === 'intro';
-  $('profile-open').hidden = !(i >= 1 && i <= 4);
-  $('phase-label').textContent = next === 'result' ? PHASE.result : `Fase ${i} di 5 · ${PHASE[next] || ''}`;
+  $('profile-open').hidden = !(i >= 2 && i <= 5);
+  $('phase-label').textContent = next === 'result' ? PHASE.result : `Fase ${i} di 7 · ${PHASE[next] || ''}`;
   closeSheets();
   updateProfilePill();
   bumpIdle();
-  ({ explore:renderDeck, ab:renderAB, color:enterColor, approach:renderApproaches, ai:runAI, result:renderResult })[next]?.();
+  ({ type:renderTypes, explore:renderDeck, ab:renderAB, approach:renderApproaches, brand:renderBrands, pals:enterPals, ai:runAI, result:renderResult })[next]?.();
 }
 
 // ── 0 · INTRO MOSAIC ──
@@ -1115,9 +1219,98 @@ function go(next) {
     $('mosaic-grid').appendChild(col);
   });
 }
-$('start').addEventListener('click', () => go('explore'));
+$('start').addEventListener('click', () => go('type'));
 
-// ── 1 · DECK ──
+// ── 1 · TYPE OF SPACE ──
+function setType(t) {
+  S.type = t;
+  const own = TYPES[t].own;
+  DECK = [...own.flatMap((o, i) => (i ? [SHARED[i - 1], o] : [o])), SHARED[7]];
+  PAIRS = TYPES[t].pairs;
+}
+let typeBusy = false;
+let carIdx = 0;
+function renderTypes() {
+  const track = $('tcar');
+  track.textContent = '';
+  $('tcar-dots').textContent = '';
+  Object.entries(TYPES).forEach(([k, T], n) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'tcard';
+    b.setAttribute('aria-label', `${T.label}: ${T.sub}`);
+    b.setAttribute('aria-pressed', 'false');
+    const img = document.createElement('img'); img.src = U(IMG[T.own[0]].id, 900); img.alt = ''; img.draggable = false;
+    const cap = document.createElement('span'); cap.className = 'tcard-cap';
+    const nm = document.createElement('span'); nm.className = 'tcard-name'; nm.textContent = T.label;
+    const sb = document.createElement('span'); sb.className = 'tcard-sub'; sb.textContent = T.sub;
+    cap.append(nm, sb);
+    b.append(img, cap);
+    // the current card is chosen with a tap; any other one comes forward first
+    b.addEventListener('click', () => { if (n === carIdx) chooseType(k, b); else carTo(n); });
+    track.appendChild(b);
+    $('tcar-dots').appendChild(document.createElement('i'));
+  });
+  track.scrollLeft = 0; carIdx = 0;
+  requestAnimationFrame(syncCar);
+}
+// the current card sits on the left edge, under the title
+function carTo(n) {
+  const track = $('tcar');
+  track.scrollTo({ left:track.children[n].offsetLeft - parseFloat(getComputedStyle(track).paddingLeft), behavior:'smooth' });
+}
+// the card nearest the left edge is the current one (the last, once the end is reached):
+// outline, dot and button follow it
+function syncCar() {
+  const track = $('tcar'), cards = [...track.children], pad = parseFloat(getComputedStyle(track).paddingLeft);
+  if (track.scrollLeft >= track.scrollWidth - track.clientWidth - 2) carIdx = cards.length - 1;
+  else {
+    let bd = Infinity;
+    cards.forEach((c, i) => { const d = Math.abs(c.offsetLeft - pad - track.scrollLeft); if (d < bd) { bd = d; carIdx = i; } });
+  }
+  cards.forEach((c, i) => c.classList.toggle('on', i === carIdx));
+  [...$('tcar-dots').children].forEach((d, i) => d.classList.toggle('on', i === carIdx));
+  $('tcar-go').textContent = `Scegli ${Object.values(TYPES)[carIdx].label}`;
+}
+$('tcar').addEventListener('scroll', () => requestAnimationFrame(syncCar), { passive:true });
+// Finger or mouse: the cards follow the hand, and on release a short drag
+// (SWIPE_PX) or a quick flick is enough to move one card on or back.
+const SWIPE_PX = 24, FLICK = 0.12;   // px, px per ms
+{
+  const track = $('tcar');
+  let x0 = 0, s0 = 0, t0 = 0, from = 0, drag = false, moved = 0;
+  track.addEventListener('pointerdown', e => {
+    drag = true; moved = 0; x0 = e.clientX; s0 = track.scrollLeft; t0 = performance.now(); from = carIdx;
+  });
+  window.addEventListener('pointermove', e => {
+    if (!drag) return;
+    moved = Math.max(moved, Math.abs(e.clientX - x0));
+    track.scrollLeft = s0 - (e.clientX - x0);
+  });
+  const end = e => {
+    if (!drag) return;
+    drag = false;
+    const dx = e.clientX - x0, v = Math.abs(dx) / Math.max(1, performance.now() - t0);
+    const step = Math.abs(dx) > SWIPE_PX || v > FLICK ? (dx < 0 ? 1 : -1) : 0;
+    carTo(Math.max(0, Math.min(track.children.length - 1, from + step)));
+  };
+  window.addEventListener('pointerup', end);
+  window.addEventListener('pointercancel', end);
+  // a drag is not a tap on the card under the hand
+  track.addEventListener('click', e => { if (moved > 8) e.stopPropagation(); }, true);
+}
+$('tcar-go').addEventListener('click', () => chooseType(Object.keys(TYPES)[carIdx], $('tcar').children[carIdx]));
+function chooseType(k, btn) {
+  if (typeBusy) return;
+  typeBusy = true;
+  setType(k);
+  S.decisions++;
+  btn.setAttribute('aria-pressed', 'true');
+  [...btn.parentElement.children].forEach(x => { if (x !== btn) x.classList.add('dimmed'); });
+  DECK.slice(0, 2).forEach(i => { new Image().src = U(IMG[i].id, 1080); });
+  later(() => { typeBusy = false; go('explore'); }, 450);
+}
+
+// ── 2 · DECK ──
 const deckEl = $('deck');
 function cardEl(pos, back) {
   const it = IMG[DECK[pos]];
@@ -1183,7 +1376,7 @@ function decide(v) {
   front.style.opacity = '0';
   const back = deckEl.querySelector('.back');
   if (back) { back.classList.remove('dragging', 'back'); back.style.transform = back.style.opacity = ''; }
-  setTimeout(() => {
+  later(() => {
     deckBusy = false;
     hotRing(-1);
     S.deckIdx++;
@@ -1228,7 +1421,7 @@ function makeSwipeable(card) {
 }
 RINGS.forEach((id, v) => $(id).addEventListener('click', () => decide(v)));
 
-// ── 2 · A OR B ──
+// ── 3 · A OR B ──
 let abBusy = false;
 function renderAB() {
   const p = PAIRS[S.abIdx];
@@ -1260,27 +1453,26 @@ function chooseAB(btn, idx) {
   updateProfilePill();
   btn.classList.add('chosen');
   [...$('ab').children].forEach(x => { if (x !== btn) x.classList.add('dimmed'); });
-  setTimeout(() => {
+  later(() => {
     abBusy = false;
     S.abIdx++;
-    if (S.abIdx >= PAIRS.length) { startRoom(); go('approach'); } else renderAB();
+    if (S.abIdx >= PAIRS.length) go('approach'); else renderAB();
   }, 520);
 }
 
 // ── AI (optional, see api/) ──
-// When the server answers, Simula shows a room the model generated from the
-// visitor's choices, and every change of palette, saturation, contrast or
-// quantity sends that room back to be repainted; "Così mi piace" asks for the
-// proposal, composed from the FinishDecor catalogue. When it does not answer
-// (static hosting, no key, offline showroom) the first failure quietly switches
-// the session back to the local photo and the local proposal.
-const MAX_EDITS = 10;   // ponytail: per-session cap on paid repaints; a server-side quota if kiosks multiply
-const EDIT_DELAY = 1200; // wait for the hand to stop before repainting
+// After the brand, the server composes three palettes from that brand's
+// catalogue. Once the visitor has chosen, it draws for every chosen palette
+// three different spaces of their type and a moodboard. When it does not answer
+// (static hosting, no key, offline showroom) the session quietly falls back to
+// palettes from the local weights and to the journey's own photos.
+const SHOTS = [{ mode:'scene', scene:0, wide:true }, { mode:'scene', scene:1 }, { mode:'scene', scene:2 }, { mode:'moodboard', wide:true }];
+const SHOT_ORDER = [0, 3, 1, 2];   // the main space and the moodboard of every palette land first
+const shotLabel = sh => (sh.mode === 'moodboard' ? 'Moodboard' : TYPES[S.type].spaces[sh.scene]);
+const IMG_PARALLEL = 3;   // pictures drawn at the same time
 const AI = {};
 function aiReset() {
-  clearTimeout(AI.timer);
-  Object.assign(AI, { on:true, base:null, shown:null, job:null, versions:[], cache:new Map(), edits:0,
-                      gen:(AI.gen || 0) + 1, editSeq:0, timer:0, proposal:null, propJob:null });
+  Object.assign(AI, { on:true, gen:(AI.gen || 0) + 1, proposal:null, propJob:null, images:null, pending:0, phase:0, t0:0 });
 }
 aiReset();
 async function api(path, body) {
@@ -1298,157 +1490,77 @@ function choices() {
     approaches: S.approaches.map(k => ARCH[k].label),
   };
 }
-// The walls as they are set right now, with the palette's own colour names
-function walls() {
-  const P = ARCH[S.pal].pal.map(([n, h]) => [n, tune(h, S.sat, S.con)]);
-  const [b, sd] = [[0, 1], [2, 0], [2, 2]][S.qty];
-  return { back:{ name:P[b][0], hex:P[b][1] }, side:{ name:P[sd][0], hex:P[sd][1] } };
-}
-function leadPal() { return ranked().map(x => x[0]).find(k => COLOR_PALS.includes(k)) || 'neutro'; }
-function aiOff(err) {
-  if (AI.on) console.warn('AI non disponibile, versione locale:', err.message);
-  AI.on = false;
-  $('ai-room').hidden = true;
-  showAiBusy('');
-  renderVersions();
-}
-function showAiBusy(text, note) {
-  const el = $('ai-busy');
-  el.hidden = !text; el.textContent = text || ''; el.classList.toggle('note', !!note);
-}
-function showAi(image) {
-  AI.shown = image;
-  const img = $('ai-room');
-  if (img.src !== image) { img.style.opacity = '0'; img.onload = () => { img.style.opacity = '1'; }; img.src = image; }
-  img.hidden = false;
-  renderVersions();
-}
-function addVersion(image) {
-  const set = { pal:S.pal, sat:S.sat, con:S.con, qty:S.qty };
-  AI.cache.set(JSON.stringify(walls()), image);
-  AI.versions.push({ image, set });
-  if (step === 'color') showAi(image); else AI.shown = image;
-}
-// Last few versions as thumbnails: tap one to go back to it, controls included
-function renderVersions() {
-  const box = $('versions'); box.textContent = '';
-  if (!AI.on || AI.versions.length < 2) return;
-  AI.versions.slice(-4).forEach(v => {
-    const b = document.createElement('button');
-    b.type = 'button'; b.setAttribute('aria-label', 'Torna a questa versione');
-    b.setAttribute('aria-current', String(v.image === AI.shown));
-    const im = document.createElement('img'); im.src = v.image; im.alt = '';
-    b.appendChild(im);
-    b.addEventListener('click', () => {
-      clearTimeout(AI.timer); AI.editSeq++;
-      Object.assign(S, v.set);
-      $('sat').value = S.sat; $('con').value = S.con;
-      paintColor(); showAi(v.image); showAiBusy('');
-    });
-    box.appendChild(b);
-  });
-}
-// Fired when A/B ends: the room is generated while the visitor picks languages
-function startRoom() {
-  if (!AI.on || AI.job) return;
-  S.pal = leadPal();
-  const gen = AI.gen;
-  AI.job = withTimeout(api('room', { mode:'generate', choices:choices(), walls:walls() }), 60000)
-    .then(({ image }) => { if (gen === AI.gen) { AI.base = image; addVersion(image); } })
-    .catch(e => { if (gen === AI.gen) aiOff(e); });
-}
-function scheduleEdit() {
-  if (!AI.on) return;
-  clearTimeout(AI.timer);
-  AI.timer = setTimeout(requestEdit, EDIT_DELAY);
-}
-async function requestEdit() {
-  if (!AI.on || step !== 'color') return;
-  if (!AI.base) { await AI.job; if (!AI.base || step !== 'color') return; }   // still generating: repaint once it lands
-  const key = JSON.stringify(walls());
-  if (AI.cache.has(key)) { showAi(AI.cache.get(key)); showAiBusy(''); return; }
-  if (AI.edits >= MAX_EDITS) { showAiBusy('Hai provato molte versioni: scegli tra quelle in basso', true); return; }
-  AI.edits++;
-  const mine = ++AI.editSeq, gen = AI.gen, w = walls(), set = { pal:S.pal, sat:S.sat, con:S.con, qty:S.qty };
-  showAiBusy('L\'AI sta ridipingendo la stanza…');
-  try {
-    // always from the ORIGINAL room: repainting a repaint drifts a little more each time
-    const { image } = await withTimeout(api('room', { mode:'edit', image:AI.base, walls:w }), 60000);
-    if (gen !== AI.gen) return;
-    AI.cache.set(key, image);
-    AI.versions.push({ image, set });
-    if (mine !== AI.editSeq || step !== 'color') { renderVersions(); return; }   // a newer change took over
-    showAi(image); showAiBusy('');
-  } catch (e) { if (gen === AI.gen) aiOff(e); }
-}
-// Fired on "Così mi piace": the proposal is written while the AI screen reads the choices
+// Fired when the brand is chosen: the proposal is written while the AI screen reads the choices
 function startProposal() {
-  AI.proposal = null;
-  AI.propJob = AI.on
-    ? withTimeout(api('proposal', { choices:choices(), tuning:{ sat:S.sat, con:S.con, qty:S.qty }, walls:walls() }), 30000)
-        .then(pr => (AI.proposal = pr)).catch(e => { console.warn('Proposta AI non disponibile:', e.message); return null; })
-    : null;
+  const gen = AI.gen;
+  AI.propJob = AI.on && S.brand
+    ? withTimeout(api('proposal', { typology:S.type, brand:S.brand, choices:choices() }), 30000)
+        .then(pr => (gen === AI.gen ? (AI.proposal = pr) : null))
+        .catch(e => { console.warn('AI non disponibile, versione locale:', e.message); if (gen === AI.gen) AI.on = false; return null; })
+    : Promise.resolve(null);
+}
+// Fired when the palettes are chosen: 4 paid pictures per chosen palette, drawn
+// while the AI screen reads the choices back to the visitor.
+function startImages() {
+  AI.images = null; AI.pending = 0;
+  if (!AI.on) return;
+  const gen = AI.gen;
+  const jobs = SHOT_ORDER.flatMap(j => S.picks.map(i => ({ i, j })));
+  AI.images = S.pals.map((_, i) => (S.picks.includes(i) ? SHOTS.map(() => null) : null));   // null = being drawn, string = ready, false = failed
+  AI.pending = jobs.length;
+  let next = 0;
+  const worker = async () => {
+    while (next < jobs.length) {
+      const { i, j } = jobs[next++], sh = SHOTS[j];
+      let image = false;
+      try {
+        ({ image } = await withTimeout(api('room', { mode:sh.mode, scene:sh.scene, typology:S.type,
+          palette:S.pals[i].colors.map(c => ({ name:c.name, hex:c.hex })), choices:choices() }), 90000));
+      } catch (e) { console.warn('Immagine AI non riuscita:', e.message); }
+      if (gen !== AI.gen) return;
+      AI.images[i][j] = image || false;
+      AI.pending--;
+      if (step === 'ai') { aiStatus(); maybeDone(); }
+      if (step === 'result') fillShots();
+    }
+  };
+  for (let k = 0; k < IMG_PARALLEL; k++) worker();
 }
 
-// ── 3 · COLOUR SIMULATION ──
-const paintColorRoom = makeRoom($('room'));
-let demoTimer = null;
-function colorPal() { return ARCH[S.pal].pal.map(([, h]) => tune(h, S.sat, S.con)); }
-function paintColor() {
-  paintColorRoom(...roomColors(colorPal(), S.qty));
-  $('sat-v').textContent = S.sat < 35 ? 'Morbida' : S.sat > 65 ? 'Intensa' : 'Media';
-  $('con-v').textContent = S.con < 35 ? 'Delicato' : S.con > 65 ? 'Deciso' : 'Misurato';
-  $('room-note').textContent = `${ARCH[S.pal].chip} · ${QTY[S.qty].toLowerCase()}`;
-  ['sat', 'con'].forEach(id => $(id).style.setProperty('--v', $(id).value + '%'));
-  $('pal-chips').querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.k === S.pal)));
-  $('qty-seg').querySelectorAll('button').forEach((b, i) => b.setAttribute('aria-pressed', String(i === S.qty)));
+// ── LOCAL PROPOSAL ──
+// What the AI would compose, from the local weights: three palettes from the
+// three strongest languages, in the chosen brand's nearest catalogue colours.
+function nearest(hex) {
+  const cols = CAT?.marchi[S.brand]?.colori;
+  if (!cols) return null;
+  const [r, g, b] = rgb(hex);
+  let best = null, bd = Infinity;
+  cols.forEach(c => { const [R, G, B] = rgb(c.hex), d = (R - r) ** 2 + (G - g) ** 2 + (B - b) ** 2; if (d < bd) { bd = d; best = c; } });
+  return best;
 }
-COLOR_PALS.forEach(k => {
-  const c = document.createElement('button');
-  c.type = 'button'; c.className = 'chip'; c.dataset.k = k;
-  const dots = document.createElement('span'); dots.className = 'pill-dots';
-  [0, 2, 4].forEach(i => { const d = document.createElement('i'); d.style.background = ARCH[k].pal[i][1]; dots.appendChild(d); });
-  const l = document.createElement('span'); l.textContent = ARCH[k].chip;
-  c.append(dots, l);
-  c.addEventListener('click', () => { stopDemo(); S.pal = k; paintColor(); scheduleEdit(); });
-  $('pal-chips').appendChild(c);
-});
-QTY.forEach((q, i) => {
-  const b = document.createElement('button');
-  b.type = 'button'; b.textContent = q;
-  b.addEventListener('click', () => { stopDemo(); S.qty = i; paintColor(); scheduleEdit(); });
-  $('qty-seg').appendChild(b);
-});
-['sat', 'con'].forEach(id => $(id).addEventListener('input', e => { stopDemo(); S[id] = +e.target.value; paintColor(); scheduleEdit(); }));
-// Until the visitor touches anything the room cycles palettes on its own:
-// the point of this step is to SEE the same space change.
-function enterColor() {
-  // open on the language the visitor is leaning towards, if it is one of the five
-  S.pal = leadPal();
-  paintColor();
-  stopDemo();
-  if (AI.on) {
-    if (AI.shown) showAi(AI.shown);
-    else if (AI.job) {
-      showAiBusy('L\'AI sta creando la tua stanza…');
-      AI.job.then(() => { if (step === 'color' && AI.on) { showAiBusy(''); if (AI.shown) showAi(AI.shown); } });
-    }
-    if (AI.job) return;   // no self-running demo: every AI repaint is a paid call
-  }
-  let i = COLOR_PALS.indexOf(S.pal);
-  demoTimer = setInterval(() => { i = (i + 1) % COLOR_PALS.length; S.pal = COLOR_PALS[i]; paintColor(); }, 2400);
+const localProducts = k => PRODUCTS[k].map(x => ({ name:x.n, code:'', where:x.w, why:x.t, color:x.sw }));
+function localProposal() {
+  const p = profile();
+  const likes = S.liked.filter(i => DECK.includes(i)).length;
+  const cats = Object.keys(S.likedCats).sort((a, b) => S.likedCats[b] / S.seenCats[b] - S.likedCats[a] / S.seenCats[a]);
+  const abTop = ranked(S.ab)[0][0];
+  return {
+    name:p.name,
+    description:`${ARCH[p.pk].desc} ${ARCH[p.sk].desc}`,
+    insights:[
+      likes ? `Ti hanno colpito ${likes} immagini su ${DECK.length}, soprattutto ${cats.slice(0, 2).join(' e ').toLowerCase()}.`
+            : 'Nessuna immagine ti ha convinto del tutto: conta anche questo.',
+      `Nei confronti hai scelto ambienti ${ARCH[abTop].adj}.`,
+      `Il linguaggio che senti più vicino: ${S.approaches.map(k => ARCH[k].label.toLowerCase()).join(', ')}.`,
+      brandName() && `Le palette arrivano dal catalogo ${brandName()}, pensate per ${TYPES[S.type].sub.toLowerCase()}.`,
+    ].filter(Boolean),
+    palettes:ranked().slice(0, 3).map(([k]) => ({
+      key:k, name:ARCH[k].noun, description:ARCH[k].desc,
+      colors:ARCH[k].pal.map(([n, h]) => { const c = nearest(h); return c ? { code:c.code, name:c.name, hex:c.hex } : { code:'', name:n, hex:h }; }),
+      products:localProducts(k),
+    })),
+  };
 }
-function stopDemo() { clearInterval(demoTimer); demoTimer = null; }
-$('color-done').addEventListener('click', () => {
-  stopDemo(); clearTimeout(AI.timer);
-  add([S.pal], 3);
-  if (S.sat > 65) add(['audace'], 2); else if (S.sat < 35) add(['neutro', 'minimale'], 1);
-  if (S.con > 65) add(['sofisticato', 'audace'], 1); else if (S.con < 35) add(['neutro'], 1);
-  if (S.qty === 2) add(['audace'], 2); else if (S.qty === 0) add(['minimale'], 1);
-  S.decisions++;
-  startProposal();
-  go('ai');
-});
 
 // ── 4 · APPROACHES ──
 const AP_ORDER = ['neutro', 'caldo', 'naturale', 'sofisticato', 'audace', 'minimale', 'materico'];
@@ -1483,146 +1595,345 @@ $('ap-done').addEventListener('click', () => {
   if (!S.approaches.length) return;
   add(S.approaches, 4);
   S.decisions++;
-  go('color');
+  if (CAT) go('brand'); else { startProposal(); go('pals'); }
 });
 
-// ── 5 · AI READING ──
-// The profile is computed locally from the weights above; this step shows the
-// visitor WHY it came out that way, one observation at a time.
+// ── 5 · BRAND ──
+let brandBusy = false;
+function renderBrands() {
+  const box = $('brand-list');
+  box.textContent = '';
+  const list = Object.entries(CAT.marchi);
+  box.classList.toggle('many', list.length > 3);
+  list.forEach(([key, m]) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'brand';
+    b.setAttribute('aria-label', m.nome);
+    b.setAttribute('aria-pressed', String(S.brand === key));
+    if (S.brand && S.brand !== key) b.classList.add('dimmed');
+    if (m.logo) { const img = document.createElement('img'); img.src = m.logo; img.alt = ''; b.appendChild(img); }
+    else { const n = document.createElement('span'); n.className = 'brand-name'; n.textContent = m.nome; b.appendChild(n); }
+    const meta = document.createElement('span'); meta.className = 'brand-meta'; meta.textContent = `${m.colori.length} colori in catalogo`; b.appendChild(meta);
+    b.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 13 4.5 4.5L19 7"/></svg>');
+    b.addEventListener('click', () => chooseBrand(key));
+    box.appendChild(b);
+  });
+}
+function chooseBrand(key) {
+  if (brandBusy) return;
+  brandBusy = true;
+  S.brand = key;
+  S.decisions++;
+  renderBrands();
+  later(() => { brandBusy = false; startProposal(); go('pals'); }, 350);
+}
+
+// ── 6 · THE PALETTES ──
+// First half a minute with only "Continua il percorso" and the fan deck: the
+// visitor goes on through the showroom and touches colours and materials.
+// Meanwhile the palettes are composed; when the time is up they appear
+// to be chosen: one, two or all three.
+const PAL_MS = 30000;
 let aiTimers = [];
-async function runAI() {
+async function enterPals() {
   aiTimers.forEach(clearTimeout); aiTimers = [];
-  const ul0 = $('ai-lines'); ul0.textContent = '';
-  $('ai-swatches').querySelectorAll('i').forEach(i => { i.style.background = ''; });
-  $('ai-swatches').classList.remove('done');
-  $('ai-title').textContent = 'Sto leggendo le tue scelte';
-  $('ai-done').hidden = true;
-  const pr = AI.propJob ? await AI.propJob : null;   // never rejects: null when the AI is not there
-  if (step !== 'ai') return;
-  const p = profile();
-  const likes = S.liked.filter(i => DECK.includes(i)).length;
-  const cats = Object.keys(S.likedCats).sort((a, b) => S.likedCats[b] / S.seenCats[b] - S.likedCats[a] / S.seenCats[a]);
-  const abTop = ranked(S.ab)[0][0];
-  const lines = [
-    likes ? `Ti hanno colpito ${likes} immagini su ${DECK.length}, soprattutto ${cats.slice(0, 2).join(' e ').toLowerCase()}.`
-          : `Nessuna immagine ti ha convinto del tutto: conta anche questo.`,
-    `Nei confronti hai scelto ambienti ${ARCH[abTop].adj}.`,
-    tasteLine(),
-    `Il linguaggio che senti più vicino: ${S.approaches.map(k => ARCH[k].label.toLowerCase()).join(', ')}.`,
-    `Il tuo profilo: ${p.name}.`,
-  ];
-  let hex = p.hex;
-  if (pr) {
-    lines.splice(0, lines.length, ...pr.insights.slice(0, 4), `Il tuo profilo: ${pr.name}.`);
-    hex = pr.palette.map(c => c.hex);
-  }
+  const mine = session;
+  S.picks = []; S.pals = [];
+  AI.minuteOver = false;
+  palsMode(1);
+  aiTimers.push(setTimeout(minuteOver, PAL_MS));
+  const pr = await AI.propJob;   // never rejects: null when the AI is not there
+  if (mine !== session || step !== 'pals') return;
+  const p = pr || localProposal();
+  // AI palettes speak no language of their own: the photos used without AI follow the ranking
+  const keys = ranked().map(x => x[0]);
+  S.pals = p.palettes.map((x, i) => ({ key:keys[i], ...x }));
+  S.prop = { name:p.name, description:p.description };
+  S.insights = p.insights;
+  renderPalCards();
+  if (AI.minuteOver) palsMode(2);
+}
+function minuteOver() {
+  AI.minuteOver = true;
+  if (step === 'pals') palsMode(S.pals.length ? 2 : 0);
+}
+// 1: the minute · 0: minute over, palettes still being composed · 2: choose
+function palsMode(n) {
+  $('s-pals').classList.toggle('center', n < 2);
+  $('pals-wait').hidden = n !== 0;
+  $('pals').hidden = n !== 2;
+  $('fan').hidden = n !== 1;
+  if (n === 1) paintWait();
+  $('pals-actions').hidden = n !== 2;
+  const many = S.pals.length !== 1;
+  $('pals-title').textContent = n === 1 ? 'Continua il percorso' : many ? 'Scegli la tua palette' : 'La tua palette';
+  $('pals-sub').textContent = n === 1 ? 'Scopri nello showroom colori e materiali e toccali con mano. Stiamo caricando le tue scelte.'
+    : n === 0 ? '' : many ? `Puoi sceglierne una o tutte e ${S.pals.length === 3 ? 'tre' : 'due'}.` : 'Toccala per continuare.';
+  if (n === 2) updatePickBtn();
+}
+// The fan deck shows the colours of the visitor's strongest languages
+function paintWait() {
+  const cols = ranked().slice(0, 3).flatMap(([k]) => ARCH[k].pal.slice(1, 4).map(x => x[1])).slice(0, 7);
+  const fan = $('fan');
+  fan.textContent = '';
+  cols.forEach((c, i) => {
+    const st = document.createElement('i');
+    st.style.background = c; st.style.setProperty('--a', `${(i - (cols.length - 1) / 2) * 15}deg`);
+    fan.appendChild(st);
+  });
+}
+function renderPalCards() {
+  const box = $('pals');
+  box.textContent = '';
+  S.pals.forEach((p, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'pal';
+    b.setAttribute('aria-pressed', 'false');
+    b.style.animationDelay = `${i * 0.12}s`;
+    const head = document.createElement('span'); head.className = 'pal-head';
+    const body = document.createElement('span'); body.className = 'pal-body';
+    const n = document.createElement('span'); n.className = 'pal-name'; n.textContent = p.name;
+    const d = document.createElement('span'); d.className = 'pal-desc'; d.textContent = p.description;
+    body.append(n, d);
+    head.appendChild(body);
+    head.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 13 4.5 4.5L19 7"/></svg>');
+    const sws = document.createElement('span'); sws.className = 'pal-sws';
+    const dots = document.createElement('span'); dots.className = 'pal-dots';
+    p.colors.forEach(c => {
+      const chip = document.createElement('i'); chip.style.background = c.hex; sws.appendChild(chip);
+      const dt = document.createElement('span'); dt.className = 'pal-dot';
+      const ci = document.createElement('i'); ci.style.background = c.hex;
+      const nm = document.createElement('b'); nm.textContent = c.name;
+      const cd = document.createElement('small'); cd.textContent = c.code || c.hex;
+      dt.append(ci, nm, cd); dots.appendChild(dt);
+    });
+    b.append(head, sws, dots);
+    b.addEventListener('click', () => {
+      const at = S.picks.indexOf(i);
+      if (at >= 0) S.picks.splice(at, 1); else S.picks.push(i);
+      b.setAttribute('aria-pressed', String(at < 0));
+      updatePickBtn();
+    });
+    box.appendChild(b);
+  });
+}
+function updatePickBtn() {
+  const n = S.picks.length;
+  $('pals-done').disabled = !n;
+  $('pals-done').textContent = n ? 'Continua' : 'Scegline almeno una';
+  $('pick-all').hidden = S.pals.length < 2;
+  $('pick-all').textContent = S.pals.length === 3 ? 'Tutte e tre' : 'Tutte e due';
+}
+$('pick-all').addEventListener('click', () => {
+  S.picks = S.pals.map((_, i) => i);
+  [...$('pals').children].forEach(b => b.setAttribute('aria-pressed', 'true'));
+  updatePickBtn();
+});
+$('pals-done').addEventListener('click', () => {
+  if (!S.picks.length) return;
+  S.picks.sort((a, b) => a - b);
+  startImages();
+  go('ai');
+});
+
+// ── 7 · AI READING ──
+// The observations appear one by one while the AI draws the spaces of the
+// chosen palettes; "Vedi il tuo progetto" appears when they are drawn, or after
+// AI_MAX at most (the rest then lands in the proposal while it is open).
+const AI_MAX = 90000;
+function runAI() {
+  aiTimers.forEach(clearTimeout); aiTimers = [];
+  AI.linesDone = false;
+  const t0 = performance.now();
   const ul = $('ai-lines'); ul.textContent = '';
-  const sw = $('ai-swatches'); sw.classList.remove('done');
-  sw.querySelectorAll('i').forEach(i => { i.style.background = ''; });
+  const sw = $('ai-swatches'), dots = sw.querySelectorAll('i');
+  sw.classList.remove('done');
+  dots.forEach(i => { i.style.background = ''; });
   $('ai-title').textContent = 'Sto leggendo le tue scelte';
+  $('ai-status').hidden = true;
   $('ai-done').hidden = true;
+  const lines = [...S.insights.slice(0, 4), `Il tuo profilo: ${S.prop.name}.`];
+  const cols = S.picks.flatMap(i => S.pals[i].colors);
   lines.forEach((t, i) => aiTimers.push(setTimeout(() => {
     const li = document.createElement('li'); li.textContent = t; ul.appendChild(li);
-    sw.querySelectorAll('i')[i].style.background = hex[i % hex.length];
-    if (i === lines.length - 1) {
-      sw.classList.add('done');
-      $('ai-title').textContent = 'Il tuo profilo è pronto';
-      $('ai-done').hidden = false;
-    }
+    dots[i % dots.length].style.background = cols[i % cols.length].hex;
+    if (i < lines.length - 1) return;
+    AI.linesDone = true;
+    aiStatus(); maybeDone();
+    aiTimers.push(setTimeout(() => maybeDone(true), Math.max(0, AI_MAX - (performance.now() - t0))));
   }, 700 + i * 1100)));
+}
+function aiStatus() {
+  const total = S.picks.length * SHOTS.length;
+  $('ai-status').hidden = !AI.linesDone || !AI.pending;
+  $('ai-status').textContent = `Sto creando i tuoi ambienti · ${total - AI.pending} di ${total}`;
+}
+function maybeDone(force) {
+  if (step !== 'ai' || !AI.linesDone || !$('ai-done').hidden || (AI.pending && !force)) return;
+  $('ai-swatches').classList.add('done');
+  $('ai-title').textContent = 'Il tuo progetto è pronto';
+  $('ai-status').hidden = true;
+  $('ai-done').hidden = false;
 }
 $('ai-done').addEventListener('click', () => go('result'));
 
-// ── 6 · RESULT ──
-const paintResultRoom = makeRoom($('r-room'));
-let altQty = 1;
-ALTS.forEach((a, i) => {
-  const b = document.createElement('button');
-  b.type = 'button'; b.textContent = a;
-  b.addEventListener('click', () => { altQty = i; paintAlt(); });
-  $('alt-seg').appendChild(b);
-});
-function paintAlt() {
-  paintResultRoom(...roomColors(profile().hex, altQty));
-  $('alt-seg').querySelectorAll('button').forEach((b, i) => b.setAttribute('aria-pressed', String(i === altQty)));
-}
+// ── 7 · RESULT ──
+// The profile, then one section per chosen palette: swatches with catalogue
+// codes, three spaces and a moodboard (the AI's, or the journey's photos and
+// colour blocks when there is no AI) and the products in that palette.
 function renderResult() {
-  const p = profile(), pr = AI.proposal;
-  // palette as [name, hex, label under the swatch]: catalogue codes when the AI composed it
-  const swatches = pr ? pr.palette.map(c => [c.name, c.hex, c.code]) : p.pal.map(([n, h]) => [n, h, h]);
-  const hexes = swatches.map(x => x[1]);
-  $('r-name').textContent = pr ? pr.name : p.name;
-  $('r-desc').textContent = pr ? pr.description : `${ARCH[p.pk].desc} ${ARCH[p.sk].desc} ${tasteLine()}`;
-  $('r-mix').textContent = p.mix;
+  $('r-name').textContent = S.prop.name;
+  $('r-desc').textContent = S.prop.description;
+  renderDna();
+  const box = $('r-pals');
+  box.textContent = '';
+  S.picks.forEach((pi, n) => {
+    const pal = S.pals[pi];
+    const sec = document.createElement('section'); sec.className = 'r-pal';
+    if (S.picks.length > 1) { const k = document.createElement('p'); k.className = 'r-pal-kicker'; k.textContent = `Palette ${n + 1} di ${S.picks.length}`; sec.appendChild(k); }
+    const h = document.createElement('h3'); h.className = 'r-pal-name'; h.textContent = pal.name; sec.appendChild(h);
+    if (pal.description) { const d = document.createElement('p'); d.className = 'r-desc'; d.textContent = pal.description; sec.appendChild(d); }
 
-  const pal = $('r-palette'); pal.textContent = '';
-  swatches.forEach(([n, h, label]) => {
-    const d = document.createElement('div');
-    const sw = document.createElement('div'); sw.className = 'r-sw'; sw.style.background = h;
-    const nm = document.createElement('div'); nm.className = 'r-sw-name'; nm.textContent = n;
-    const hx = document.createElement('div'); hx.className = 'r-sw-hex'; hx.textContent = label;
-    d.append(sw, nm, hx); pal.appendChild(d);
+    const sw = document.createElement('div'); sw.className = 'r-palette';
+    pal.colors.forEach(c => {
+      const d = document.createElement('div');
+      const chip = document.createElement('div'); chip.className = 'r-sw'; chip.style.background = c.hex;
+      const nm = document.createElement('div'); nm.className = 'r-sw-name'; nm.textContent = c.name;
+      const cd = document.createElement('div'); cd.className = 'r-sw-hex'; cd.textContent = c.code || c.hex;
+      d.append(chip, nm, cd); sw.appendChild(d);
+    });
+    const grid = document.createElement('div'); grid.className = 'gen-grid';
+    SHOTS.forEach((sh, j) => {
+      const g = document.createElement('div'); g.className = 'gen' + (sh.wide ? ' wide' : '');
+      g.dataset.i = pi; g.dataset.j = j;
+      const tag = document.createElement('span'); tag.className = 'gen-tag'; tag.textContent = shotLabel(sh);
+      g.appendChild(tag); grid.appendChild(g);
+    });
+    const ph = document.createElement('h4'); ph.className = 'r-h'; ph.textContent = 'Indicazioni di prodotto';
+    const prods = document.createElement('div');
+    pal.products.forEach(x => {
+      const c = pal.colors[x.color] || pal.colors[0];
+      const row = document.createElement('div'); row.className = 'prod';
+      const chip = document.createElement('div'); chip.className = 'prod-sw'; chip.style.background = c.hex;
+      const body = document.createElement('div');
+      const nm = document.createElement('div'); nm.className = 'prod-name'; nm.textContent = x.code ? `${x.name} · ${x.code}` : x.name;
+      const w = document.createElement('div'); w.className = 'prod-where'; w.textContent = `${x.where} · ${c.name}`;
+      const t = document.createElement('div'); t.className = 'prod-note'; t.textContent = x.why;
+      body.append(nm, w, t); row.append(chip, body); prods.appendChild(row);
+    });
+    sec.append(sw, grid, ph, prods);
+    box.appendChild(sec);
   });
-
-  // the room the visitor approved in Simula, when the AI made one; else the local alternatives
-  const aiImg = $('r-ai-room');
-  aiImg.hidden = !AI.shown; if (AI.shown) aiImg.src = AI.shown;
-  $('alt-seg').hidden = !!AI.shown;
-  altQty = S.qty;
-  paintAlt();
-
-  // Moodboard: the visitor's own yeses first, best match on top; topped up from
-  // the leading languages so the grid never has holes (1 big + palette + 3 + 3).
-  const fit = i => IMG[i].tags.reduce((a, k) => a + (k === p.pk ? 2 : k === p.sk ? 1 : 0), 0);
-  let pics = [...new Set(S.liked)].sort((a, b) => fit(b) - fit(a));
-  IMG.map((_, i) => i).filter(i => !pics.includes(i)).sort((a, b) => fit(b) - fit(a))
-    .forEach(i => { if (pics.length < 7) pics.push(i); });
-  pics = pics.slice(0, 7);
-  const mood = $('r-mood'); mood.textContent = '';
-  pics.forEach((i, j) => {
-    const img = document.createElement('img'); img.src = U(IMG[i].id, j ? 400 : 800); img.alt = IMG[i].t; img.loading = 'lazy';
-    mood.appendChild(img);
-    if (j === 0) {
-      const pt = document.createElement('div'); pt.className = 'mood-pal';
-      hexes.forEach(h => { const b = document.createElement('i'); b.style.background = h; pt.appendChild(b); });
-      mood.appendChild(pt);
-    }
-  });
-
-  // one shape for both sources: name, code, where, why, palette slot
-  const prods = pr
-    ? pr.products.map(x => ({ n:x.name, code:x.code, w:x.where, t:x.why, sw:x.color }))
-    : [...PRODUCTS[p.pk], ...PRODUCTS[p.sk].slice(0, 2)];
-  const box = $('r-prod'); box.textContent = '';
-  prods.forEach(x => {
-    const row = document.createElement('div'); row.className = 'prod';
-    const sw = document.createElement('div'); sw.className = 'prod-sw'; sw.style.background = hexes[x.sw] || hexes[0];
-    const body = document.createElement('div');
-    const n = document.createElement('div'); n.className = 'prod-name'; n.textContent = x.code ? `${x.n} · ${x.code}` : x.n;
-    const w = document.createElement('div'); w.className = 'prod-where'; w.textContent = `${x.w} · ${(swatches[x.sw] || swatches[0])[0]}`;
-    const t = document.createElement('div'); t.className = 'prod-note'; t.textContent = x.t;
-    body.append(n, w, t); row.append(sw, body); box.appendChild(row);
-  });
+  fillShots();
   $('result-scroll').scrollTop = 0;
+}
+// The three strongest languages as one bar, each in its own accent colour
+// (colour as information), then two tiles: the space and the brand.
+function renderDna() {
+  const top = ranked().slice(0, 3).filter(([, v]) => v > 0), sum = top.reduce((a, [, v]) => a + v, 0) || 1;
+  const box = $('r-dna'); box.textContent = '';
+  const h = document.createElement('p'); h.className = 'r-dna-h'; h.textContent = 'Il tuo mix di linguaggi';
+  const bar = document.createElement('div'); bar.className = 'r-dna-bar';
+  const legend = document.createElement('div'); legend.className = 'r-dna-legend';
+  top.forEach(([k, v]) => {
+    const pct = Math.round(v / sum * 100), col = ARCH[k].pal[2][1];
+    const seg = document.createElement('i'); seg.style.background = col; seg.dataset.grow = pct; bar.appendChild(seg);
+    const it = document.createElement('span');
+    const dot = document.createElement('i'); dot.style.background = col;
+    const nm = document.createElement('b'); nm.textContent = ARCH[k].label;
+    it.append(dot, nm, ` ${pct}%`); legend.appendChild(it);
+  });
+  box.append(h, bar, legend);
+  requestAnimationFrame(() => requestAnimationFrame(() => bar.querySelectorAll('i').forEach(i => { i.style.flexGrow = i.dataset.grow; })));
+
+  const facts = $('r-facts'); facts.textContent = '';
+  const fact = (k, v, cls) => {
+    const f = document.createElement('div'); f.className = 'r-fact' + (cls ? ' ' + cls : '');
+    const kk = document.createElement('span'); kk.className = 'r-fact-k'; kk.textContent = k;
+    const vv = document.createElement('span'); vv.className = 'r-fact-v'; vv.textContent = v;
+    f.append(kk, vv); facts.appendChild(f); return f;
+  };
+  const T = TYPES[S.type];
+  const sp = fact('Spazio', T.label, 'photo');
+  const bg = document.createElement('img'); bg.className = 'bg'; bg.src = U(IMG[T.own[0]].id, 600); bg.alt = ''; sp.prepend(bg);
+  const m = CAT?.marchi[S.brand];
+  if (m) {
+    const br = fact('Marchio', m.nome);
+    if (m.logo) { const lg = document.createElement('img'); lg.className = 'logo'; lg.src = m.logo; lg.alt = ''; br.prepend(lg); }
+  }
+}
+// The journey's photos of this type of space, closest to a palette's language first
+function localShots(key) {
+  const T = TYPES[S.type];
+  const fit = i => (IMG[i].tags.includes(key) ? 3 : 0) + (S.liked.includes(i) ? 2 : 0);
+  return [...new Set([...T.own, ...T.pairs.flatMap(p => [p.a, p.b])])].sort((a, b) => fit(b) - fit(a));
+}
+// Every picture slot gets the AI's picture when it is ready, a shimmer while it
+// is being drawn, and the local stand-in when there is no AI or it failed.
+function fillShots() {
+  document.querySelectorAll('#r-pals .gen').forEach(g => {
+    if (g.dataset.done) return;
+    const i = +g.dataset.i, j = +g.dataset.j, pal = S.pals[i], sh = SHOTS[j];
+    const got = AI.images?.[i]?.[j];
+    g.classList.toggle('busy', got === null);
+    if (got === null) return;
+    g.dataset.done = '1';
+    if (got) { putImg(g, got, `${shotLabel(sh)}: ${pal.name}`); return; }
+    if (sh.mode === 'moodboard') {   // no moodboard without the AI: the palette as colour blocks
+      const m = document.createElement('div'); m.className = 'gen-pal';
+      pal.colors.forEach(c => { const b = document.createElement('i'); b.style.background = c.hex; m.appendChild(b); });
+      g.prepend(m);
+      return;
+    }
+    const it = IMG[localShots(pal.key)[sh.scene]];
+    putImg(g, U(it.id, sh.wide ? 1080 : 600), it.t);
+  });
+}
+function putImg(g, src, alt) {
+  const img = document.createElement('img');
+  img.alt = alt; img.loading = 'lazy';
+  img.onload = () => img.classList.add('in');
+  img.src = src;
+  g.prepend(img);
 }
 
 // ── SAVE & SHARE ──
-// The whole project fits in the URL: scores, tuning, the pictures said yes to.
-// No server, nothing stored about the visitor — the phone that scans the QR
-// rebuilds the same result from the link.
+// The whole project fits in the URL: type, brand, scores, the pictures said
+// yes to, the chosen palettes as catalogue codes. No server, nothing stored
+// about the visitor — the phone that scans the QR rebuilds the proposal from
+// the link (with the journey's photos: the AI pictures stay on the showroom screen).
 function encode() {
-  return [KEYS.map(k => Math.max(0, S.scores[k])).join('.'), S.sat, S.con, S.qty,
-          [...new Set(S.liked)].join('.'), S.approaches.map(k => KEYS.indexOf(k)).join('.')].join('-');
+  return encodeURIComponent(JSON.stringify({
+    t:S.type, b:S.brand, n:S.prop.name,
+    s:KEYS.map(k => Math.max(0, S.scores[k])), l:[...new Set(S.liked)], a:S.approaches.map(k => KEYS.indexOf(k)),
+    p:S.picks.map(i => [S.pals[i].name, S.pals[i].colors.map(c => c.code || c.hex)]),
+  }));
+}
+function codeToColor(x) {
+  x = String(x);
+  if (/^#[0-9A-F]{6}$/i.test(x)) return { code:'', name:'', hex:x };
+  const c = CAT && Object.values(CAT.marchi).flatMap(m => m.colori).find(c => c.code === x);
+  return c ? { code:c.code, name:c.name, hex:c.hex } : null;
 }
 function decode(code) {
-  const [sc, sat, con, qty, liked = '', ap = ''] = code.split('-');
-  const nums = sc.split('.').map(Number);
-  if (nums.length !== KEYS.length || nums.some(n => !Number.isFinite(n))) return false;
+  let d;
+  try { d = JSON.parse(decodeURIComponent(code)); } catch { return false; }
+  if (!d || !Object.hasOwn(TYPES, d.t) || !Array.isArray(d.s) || d.s.length !== KEYS.length || !Array.isArray(d.p) || !d.p.length) return false;
   fresh();
-  KEYS.forEach((k, i) => { S.scores[k] = clamp(nums[i], 0, 999); });
-  S.sat = clamp(+sat || 50, 0, 100); S.con = clamp(+con || 50, 0, 100); S.qty = clamp(+qty || 0, 0, 2);
-  S.liked = liked.split('.').map(Number).filter(i => Number.isInteger(i) && IMG[i]);
-  S.approaches = ap.split('.').map(Number).filter(i => KEYS[i]).map(i => KEYS[i]);
+  setType(d.t);
+  S.brand = CAT && Object.hasOwn(CAT.marchi, d.b) ? d.b : null;
+  KEYS.forEach((k, i) => { S.scores[k] = clamp(+d.s[i] || 0, 0, 999); });
+  S.liked = (d.l || []).map(Number).filter(i => Number.isInteger(i) && IMG[i]);
+  S.approaches = (d.a || []).map(Number).filter(i => KEYS[i]).map(i => KEYS[i]);
+  const keys = ranked().map(x => x[0]), p = profile();
+  S.pals = d.p.slice(0, 3).map(([name, codes], i) => ({
+    key:keys[i], name:String(name || ARCH[keys[i]].noun).slice(0, 40), description:'',
+    colors:(Array.isArray(codes) ? codes : []).slice(0, 5).map(codeToColor).filter(Boolean),
+    products:localProducts(keys[i]),
+  })).filter(x => x.colors.length);
+  if (!S.pals.length) return false;
+  S.picks = S.pals.map((_, i) => i);
+  S.prop = { name:String(d.n || p.name).slice(0, 40), description:`${ARCH[p.pk].desc} ${ARCH[p.sk].desc}` };
   S.decisions = TOTAL;
   S.shared = true;
   return true;
@@ -1703,7 +2014,8 @@ const modal = $('restart-modal');
 function openModal() { modal.hidden = false; requestAnimationFrame(() => modal.classList.add('active')); }
 function closeModal() { modal.classList.remove('active'); setTimeout(() => { if (!modal.classList.contains('active')) modal.hidden = true; }, 300); }
 function reset() {
-  stopDemo(); aiTimers.forEach(clearTimeout);
+  aiTimers.forEach(clearTimeout);
+  session++; typeBusy = deckBusy = abBusy = brandBusy = false;
   closeModal(); closeSheets(); fresh(); aiReset();
   if (location.hash) history.replaceState(null, '', location.pathname + location.search);
   go('intro');
@@ -1731,13 +2043,14 @@ let idleT;
 function bumpIdle() {
   clearTimeout(idleT);
   if (S.shared || step === 'intro') return;
-  idleT = setTimeout(reset, IDLE_MS);
+  idleT = setTimeout(reset, step === 'pals' ? IDLE_MS * 3 : IDLE_MS);   // the palette step sends the visitor to the sample wall
 }
 ['pointerdown', 'keydown', 'input'].forEach(ev => document.addEventListener(ev, bumpIdle, { passive:true }));
 
 // ── BOOT ──
-const m = location.hash.match(/^#p=([\d.\-]+)$/);
-if (m && decode(m[1])) go('result'); else go('intro');
+// a shared link needs the catalogue to turn its codes back into colours
+const m = location.hash.match(/^#p=(.+)$/);
+if (m) catReady.then(() => go(decode(m[1]) ? 'result' : 'intro')); else go('intro');
 </script>
 </body>
 </html>

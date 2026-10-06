@@ -40,26 +40,57 @@ export function textOut(json) {
   return (json.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('');
 }
 
-// Only real image data URLs get forwarded to the model
-export function dataUrlParts(url) {
-  const m = /^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/=]+)$/.exec(typeof url === 'string' ? url : '');
-  if (!m) throw new HttpError(400, 'Immagine non valida');
-  if (m[2].length > 8_000_000) throw new HttpError(413, 'Immagine troppo grande');
-  return { mimeType: m[1], data: m[2] };
-}
-
 // Untrusted text from the page goes into prompts: keep it short and single-line
 export function clean(v, max = 60) {
   return String(v ?? '').replace(/[\r\n\t]+/g, ' ').replace(/[^\p{L}\p{N} .,'&·()#%-]/gu, '').slice(0, max).trim();
 }
 
 const HEX = /^#[0-9A-Fa-f]{6}$/;
-export function checkWalls(w) {
-  const wall = x => {
-    if (!x || !HEX.test(x.hex)) throw new HttpError(400, 'Colore parete non valido');
-    return { name: clean(x.name, 30), hex: x.hex.toUpperCase() };
-  };
-  return { back: wall(w?.back), side: wall(w?.side) };
+// A palette as the page sends it: 3 to 5 colours, each a name and a hex
+export function checkPalette(p) {
+  if (!Array.isArray(p) || p.length < 3 || p.length > 5) throw new HttpError(400, 'Palette non valida');
+  return p.map(c => {
+    if (!c || !HEX.test(c.hex)) throw new HttpError(400, 'Colore non valido');
+    return { name: clean(c.name, 30), hex: c.hex.toUpperCase() };
+  });
+}
+
+// The space types of the journey's first step: the Italian name the AI writes
+// for, and the three different spaces the image model draws for every chosen
+// palette. Same order as `spaces` in TYPES (index.html), which labels them.
+export const TIPI = {
+  casa: { it: 'Casa (abitazione privata)', scenes: [
+    'the living room of a private home',
+    'the bedroom of the same home',
+    'the kitchen with a dining table of the same home'] },
+  hotel: { it: 'Hotel', scenes: [
+    'a boutique hotel bedroom suite',
+    'the hotel lobby with its reception desk',
+    'the en-suite hotel bathroom with a freestanding tub'] },
+  ristorante: { it: 'Ristorante, bistrot, bar o caffè', scenes: [
+    'a restaurant dining room set for service',
+    'the bar counter of the same restaurant, with stools',
+    'a cosy corner of the same restaurant with banquette seating'] },
+  negozio: { it: 'Negozio, boutique o showroom', scenes: [
+    'a boutique retail store interior with clothing rails and a counter',
+    'a display wall with shelves and niches in the same shop',
+    'the fitting room area of the same shop'] },
+  ufficio: { it: 'Ufficio', scenes: [
+    'a contemporary open-plan office with workstations',
+    'a meeting room in the same office',
+    'an executive private office in the same office'] },
+  business: { it: 'Spazi business di rappresentanza: hall, reception, lounge', scenes: [
+    'a corporate entrance lobby with a reception desk',
+    'the waiting lounge of the same building',
+    'a conference room in the same building'] },
+  wellness: { it: 'Wellness: spa, piscina, palestra, centro estetico', scenes: [
+    'a spa relaxation room with loungers',
+    'the indoor pool of the same spa',
+    'a treatment room of the same spa'] },
+};
+export function checkTipo(t) {
+  if (!Object.hasOwn(TIPI, t)) throw new HttpError(400, 'Tipologia non valida');
+  return t;
 }
 
 export function send(res, status, obj) {

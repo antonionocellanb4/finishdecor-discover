@@ -42,7 +42,8 @@ http.createServer(async (req, res) => {
   if (rel.startsWith('..') || /^(api|\.env|dev-server)/.test(rel)) { res.writeHead(404).end(); return; }
   try {
     const body = await readFile(join(ROOT, rel));
-    res.writeHead(200, { 'content-type': TYPES[extname(rel)] || 'application/octet-stream' }).end(body);
+    // no-cache: the page is being edited, a reload must always show the latest version
+    res.writeHead(200, { 'content-type': TYPES[extname(rel)] || 'application/octet-stream', 'cache-control': 'no-cache' }).end(body);
   } catch { res.writeHead(404).end('Non trovato'); }
 }).listen(PORT, () => {
   const mode = process.env.AI_MOCK === '1' ? 'AI di prova (AI_MOCK=1)' : process.env.GEMINI_API_KEY ? 'AI attiva (Gemini)' : 'senza AI (manca GEMINI_API_KEY)';
