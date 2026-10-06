@@ -513,7 +513,8 @@ img{display:block}
 #s-pals.center{justify-content:center;text-align:center}
 #s-pals.center .screen-head{margin-bottom:0}
 #s-pals.center .screen-sub{max-width:24rem;margin:0.75rem auto 0}
-/* the way on: a dotted path running right into an amber arrowhead */
+/* during the wait the palettes are only to read: the codes to look for in the showroom */
+.pals[inert] .pal svg{display:none}
 /* the way on: a fan deck in the visitor's colours, opening and closing */
 .fan{position:relative;width:16rem;height:13rem;margin:2.5rem auto 0}
 .fan i{
@@ -1651,23 +1652,26 @@ async function enterPals() {
   S.prop = { name:p.name, description:p.description };
   S.insights = p.insights;
   renderPalCards();
-  if (AI.minuteOver) palsMode(2);
+  palsMode(AI.minuteOver ? 2 : 1);
 }
 function minuteOver() {
   AI.minuteOver = true;
   if (step === 'pals') palsMode(S.pals.length ? 2 : 0);
 }
-// 1: the minute · 0: minute over, palettes still being composed · 2: choose
+// 1: the wait (fan deck until the palettes are there, then the palettes to read) · 0: wait over, palettes still being composed · 2: choose
 function palsMode(n) {
-  $('s-pals').classList.toggle('center', n < 2);
+  const ready = S.pals.length > 0, look = n === 1 && ready;
+  $('s-pals').classList.toggle('center', n === 0 || (n === 1 && !ready));
   $('pals-wait').hidden = n !== 0;
-  $('pals').hidden = n !== 2;
-  $('fan').hidden = n !== 1;
-  if (n === 1) paintWait();
+  $('pals').hidden = !(n === 2 || look);
+  $('pals').inert = look;
+  $('fan').hidden = !(n === 1 && !ready);
+  if (n === 1 && !ready) paintWait();
   $('pals-actions').hidden = n !== 2;
   const many = S.pals.length !== 1;
   $('pals-title').textContent = n === 1 ? 'Continua il percorso' : many ? 'Scegli la tua palette' : 'La tua palette';
-  $('pals-sub').textContent = n === 1 ? 'Scopri nello showroom colori e materiali e toccali con mano. Stiamo caricando le tue scelte.'
+  $('pals-sub').textContent = look ? `Cerca questi codici ${brandName()} nello showroom e tocca i colori con mano.`
+    : n === 1 ? 'Scopri nello showroom colori e materiali e toccali con mano. Stiamo caricando le tue scelte.'
     : n === 0 ? '' : many ? `Puoi sceglierne una o tutte e ${S.pals.length === 3 ? 'tre' : 'due'}.` : 'Toccala per continuare.';
   if (n === 2) updatePickBtn();
 }
