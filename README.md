@@ -9,6 +9,9 @@ frame 9:16, isola glass in alto, ambra come unico accento, DM Sans, sheet iOS.
 
 ## Il percorso
 
+Un solo percorso. Se nello showroom ci sono due schermi, mostrano la stessa cosa
+(sono sincronizzati): il cliente può riprendere dall'uno o dall'altro.
+
 | Fase | Cosa fa il cliente | Cosa raccoglie il sistema |
 |---|---|---|
 | 0 · Attract | Vede un muro di immagini che scorre, tocca "Inizia" | — |
@@ -16,16 +19,25 @@ frame 9:16, isola glass in alto, ambra come unico accento, DM Sans, sheet iOS.
 | 2 · Esplora | 16 immagini: le 8 della tipologia scelta alternate a 8 ispirazioni comuni (paesaggi, arte, architettura, materia). "Non fa per me", "Mi incuriosisce" o "Mi rappresenta", anche trascinando (sinistra, su, destra) | −1 / +1 / +3 ai linguaggi di ogni immagine |
 | 3 · Scegli | 6 confronti A oppure B, diversi per ogni tipologia | +3 ai linguaggi dell'ambiente scelto |
 | 4 · Linguaggio | Sceglie fino a tre approcci tra neutro, caldo, naturale, sofisticato, audace, minimale, materico | +4 a ciascuno |
-| 5 · Marchio | Sceglie il marchio (oggi Sikkens o Duco) | il catalogo da cui nascono le palette |
-| 6 · Palette | Per 30 secondi vede solo "Continua il percorso" con una mazzetta di campioni nei suoi colori che si apre a ventaglio: prosegue nello showroom e tocca con mano colori e materiali. Poi compaiono le tre palette, con nome e codice di ogni colore: "Scegli la tua palette", una, due o tutte e tre | le palette scelte |
+| 5 · Palette | Vede le sue tre palette (nome di ogni colore, ancora senza marchio) e un QR "Portale con te". Quando il telefono apre il QR, lo schermo passa a "Continua il percorso" con una mazzetta nei suoi colori che si apre a ventaglio, finché fa il giro fisico dei campioni. Dopo 1 minuto (`WAIT_MS`) compare il pulsante "Continua il percorso", che riporta le stesse palette come "Scegli la tua palette", una, due o tutte e tre. Senza telefono: "Continua senza telefono" | le palette scelte |
+| 6 · Marchio | Sceglie il marchio (oggi Sikkens o Duco) | ogni colore diventa il colore più vicino del suo catalogo, con il codice; i prodotti diventano quelli del marchio |
 | 7 · Il progetto | Legge le osservazioni dell'AI mentre l'AI disegna, per ogni palette scelta, tre spazi diversi della sua tipologia e un moodboard | — |
-| Proposta | Nome del profilo e, per ogni palette scelta: colori con i codici del catalogo, tre spazi (per un hotel: camera, hall, bagno), il moodboard, indicazioni di prodotto | — |
+| Proposta | Nome del profilo e, per ogni palette scelta: colori con i codici del catalogo, tre spazi (per un hotel: camera, hall, bagno), il moodboard, i prodotti del marchio | — |
 
 La pillola "Profilo" in alto mostra il profilo che si forma a ogni scelta.
 
-L'attesa della fase 6 (30 s) è `PAL_MS`; la fase 7 aspetta le immagini al massimo `AI_MAX` (90 s),
-poi apre la proposta e le immagini mancanti arrivano lì. Durante la fase 6 il ritorno
-automatico all'inizio scatta dopo 6 minuti invece di 2: il cliente è alla parete dei campioni.
+**Il QR delle palette.** Il link porta le palette con sé (nomi e colori, circa
+300 caratteri dopo `#v=`): il telefono le mostra senza server. Porta anche un
+`?scan=` casuale: aprendolo il telefono avvisa `api/scan`, e lo schermo, che chiede
+ogni 1,5 s, passa all'attesa. `api/scan` tiene gli avvisi in memoria: va bene col
+server locale sul PC dello showroom; su Vercel serve un archivio condiviso
+(Vercel KV / Upstash). Per provarlo col telefono in locale apri la pagina
+dall'indirizzo di rete del PC (es. `http://192.168.1.20:8137`), non da `localhost`,
+con telefono e PC sulla stessa rete.
+
+La fase 7 aspetta le immagini al massimo `AI_MAX` (90 s), poi apre la proposta e
+le immagini mancanti arrivano lì. Durante la fase 5 il ritorno automatico
+all'inizio scatta dopo 6 minuti invece di 2: il cliente è alla parete dei campioni.
 
 ## Salvare e condividere
 
@@ -52,20 +64,21 @@ sul telefono non si azzera mai.
 
 ## L'AI (facoltativa)
 
-Due funzioni server in `api/`, che Vercel pubblica da sole insieme alla pagina:
+Funzioni server in `api/` (più `api/scan.js` per il QR delle palette), che Vercel pubblica da sole insieme alla pagina:
 
 | File | Quando | Cosa fa |
 |---|---|---|
-| `api/proposal.js` | scelta del marchio | scrive profilo, osservazioni e **tre palette** con i loro prodotti, scegliendo **solo** dal catalogo del marchio in `data/catalogo.js` |
+| `api/proposal.js` | dopo il linguaggio | scrive profilo, osservazioni e **tre palette** di colori liberi (nome + hex): il marchio non è ancora scelto |
 | `api/room.js` | dopo la scelta delle palette | per ogni palette scelta disegna tre spazi diversi della tipologia (Gemini, modello immagini) e un moodboard |
 
 - **La chiave non entra mai nella pagina.** Sta in `GEMINI_API_KEY`: in locale
   nel file `.env` (copia `.env.example`), online nelle Environment Variables di Vercel.
-- **L'AI non può inventare.** Il server scarta ogni codice colore o prodotto che
-  non esiste nel catalogo del marchio scelto.
+- **L'AI non può inventare codici.** I codici li mette la pagina dopo la scelta
+  del marchio: ogni colore diventa il colore più vicino del catalogo in
+  `data/catalogo.js`, e i prodotti sono quelli del marchio per il linguaggio della palette.
 - **Nessun errore a schermo.** Se l'AI non risponde (niente chiave, rete giù,
   errore del modello) la sessione usa tre palette calcolate in locale dai
-  linguaggi più forti, con i colori del catalogo più vicini, e le foto del percorso.
+  linguaggi più forti e le foto del percorso.
 - **Costi.** 1 testo + 4 immagini per ogni palette scelta (da 4 a 12 per cliente),
   3 alla volta (`IMG_PARALLEL`). Le palette non scelte non vengono disegnate.
 - **Modelli:** `GEMINI_IMAGE_MODEL` e `GEMINI_TEXT_MODEL` in `.env` per cambiarli
@@ -88,7 +101,7 @@ senza la scelta del marchio (il catalogo non si può leggere da file).
 ## Dove si cambia cosa
 
 - `data/catalogo.js` — i marchi, ognuno con i suoi colori e prodotti. Una voce
-  in più in `marchi` aggiunge il marchio alla fase 5. **I cataloghi attuali sono
+  in più in `marchi` aggiunge il marchio alla fase 6. **I cataloghi attuali sono
   di esempio** (stessi colori per tutti, codici SIK-/DUC- inventati): vanno
   sostituiti con le cartelle colori vere, stessa forma.
 - `api/_gemini.js`, `TIPI` — il nome di ogni tipologia per l'AI e i tre spazi da disegnare (stesso ordine di `spaces` in `TYPES`).

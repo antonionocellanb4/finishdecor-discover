@@ -509,13 +509,25 @@ img{display:block}
 .pal-dot i{width:1.5rem;height:1.5rem;border-radius:50%;margin-bottom:0.3125rem;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.18)}
 .pal-dot b{max-width:100%;font-size:0.6875rem;font-weight:500;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pal-dot small{font-size:0.625rem;color:var(--label-3);font-variant-numeric:tabular-nums}
-/* the wait in the showroom: a centred message and the fan deck, no palettes yet */
+/* during the wait the palettes are only to read: the colours to look for in the showroom.
+   The cards ignore touches, so a drag still scrolls the list */
+.pals.look .pal{pointer-events:none}
+.pals.look .pal svg{display:none}
+/* the QR that takes the palettes onto the phone, under them */
+.pals-qr{
+  flex:0 0 auto;display:flex;align-items:center;gap:1.25rem;margin-top:0.75rem;padding:1rem;
+  border-radius:var(--r-card);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+}
+.pals-qr .qr{flex:0 0 auto;width:8.5rem;height:8.5rem;margin:0;padding:0.5rem;border-radius:0.875rem}
+.pals-qr-body{flex:1 1 auto;min-width:0}
+.pals-qr-title{font-size:1.25rem;font-weight:500;line-height:1.25}
+.pals-qr-text{font-size:0.9375rem;line-height:1.4;color:var(--label-2);margin-top:0.25rem}
+.pals-qr-skip{margin-top:0.5rem;padding:0.375rem 0;font-size:0.875rem;font-weight:500;color:var(--label-2);text-decoration:underline;text-underline-offset:0.2em}
+/* the wait in the showroom: a centred message and the fan deck in the palettes' colours */
 #s-pals.center{justify-content:center;text-align:center}
 #s-pals.center .screen-head{margin-bottom:0}
 #s-pals.center .screen-sub{max-width:24rem;margin:0.75rem auto 0}
-/* during the wait the palettes are only to read: the codes to look for in the showroom */
-.pals[inert] .pal svg{display:none}
-/* the way on: a fan deck in the visitor's colours, opening and closing */
 .fan{position:relative;width:16rem;height:13rem;margin:2.5rem auto 0}
 .fan i{
   position:absolute;left:calc(50% - 1.5rem);bottom:0;width:3rem;height:12rem;border-radius:0.75rem;
@@ -525,6 +537,8 @@ img{display:block}
 }
 .fan i::after{content:'';position:absolute;left:50%;bottom:1.25rem;width:0.5rem;height:0.5rem;margin-left:-0.25rem;border-radius:50%;background:rgba(0,0,0,0.4)}
 @keyframes fan{0%,10%{transform:rotate(0)}42%,72%{transform:rotate(var(--a))}100%{transform:rotate(0)}}
+/* after a minute in the showroom, the way back to the palettes */
+.wait-go{width:min(100%,22rem);margin:2.5rem auto 0;animation:rise .5s cubic-bezier(0.32,0.72,0,1)}
 .ai-status{display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-top:1.25rem;font-size:0.9375rem;color:var(--label-2);text-align:center}
 .ai-status::before{
   content:'';flex:0 0 auto;width:0.875rem;height:0.875rem;border-radius:50%;
@@ -772,9 +786,18 @@ img{display:block}
       <h2 class="screen-title" id="pals-title">Le tue palette</h2>
       <p class="screen-sub" id="pals-sub"></p>
       <div class="fan" id="fan" aria-hidden="true" hidden></div>
+      <button class="btn-primary wait-go" id="wait-go" type="button" hidden>Continua il percorso</button>
     </div>
-    <p class="ai-status" id="pals-wait" role="status" hidden>Sto componendo le palette dal catalogo che hai scelto</p>
+    <p class="ai-status" id="pals-wait" role="status" hidden>Sto componendo le tue palette</p>
     <div class="pals" id="pals" hidden></div>
+    <div class="pals-qr" id="pals-qr" hidden>
+      <div class="qr" id="pals-qr-code" role="img" aria-label="Codice QR delle tue palette"></div>
+      <div class="pals-qr-body">
+        <p class="pals-qr-title">Portale con te</p>
+        <p class="pals-qr-text">Inquadra il codice con il telefono: avrai le tue palette sotto mano mentre tocchi i colori nello showroom.</p>
+        <button class="pals-qr-skip" id="pals-qr-skip" type="button">Continua senza telefono</button>
+      </div>
+    </div>
     <div class="actions" id="pals-actions" hidden>
       <button class="btn-quiet" id="pick-all" type="button">Tutte e tre</button>
       <button class="btn-primary" id="pals-done" type="button" disabled>Scegline almeno una</button>
@@ -1178,7 +1201,7 @@ function profile() {
 
 // ── TOP BAR ──
 const $ = id => document.getElementById(id);
-const STEPS = ['intro', 'type', 'explore', 'ab', 'approach', 'brand', 'pals', 'ai', 'result'];
+const STEPS = ['intro', 'type', 'explore', 'ab', 'approach', 'pals', 'brand', 'ai', 'result'];
 const PHASE = { type:'Ambiente', explore:'Esplora', ab:'Scegli', approach:'Linguaggio', brand:'Marchio', pals:'Palette', ai:'Il progetto', result:'Il tuo progetto' };
 let step = 'intro';
 
@@ -1195,9 +1218,9 @@ function go(next) {
   STEPS.forEach(s => { $('s-' + s).hidden = s !== next; });
   const i = STEPS.indexOf(next);
   document.querySelector('.topbar').hidden = next === 'intro'; // the attract screen is all picture
-  $('phase-row').hidden = next === 'intro';
-  $('restart').hidden = next === 'intro';
-  $('profile-open').hidden = !(i >= 2 && i <= 5);
+  $('phase-row').hidden = next === 'intro' || VIEW;
+  $('restart').hidden = next === 'intro' || VIEW;
+  $('profile-open').hidden = VIEW || !(i >= 2 && i <= 5);
   $('phase-label').textContent = next === 'result' ? PHASE.result : `Fase ${i} di 7 · ${PHASE[next] || ''}`;
   closeSheets();
   updateProfilePill();
@@ -1462,8 +1485,9 @@ function chooseAB(btn, idx) {
 }
 
 // ── AI (optional, see api/) ──
-// After the brand, the server composes three palettes from that brand's
-// catalogue. Once the visitor has chosen, it draws for every chosen palette
+// After the languages, the server composes three palettes of free colours.
+// Once the visitor has chosen them and the brand, the colours turn into that
+// brand's nearest catalogue codes, and the AI draws for every chosen palette
 // three different spaces of their type and a moodboard. When it does not answer
 // (static hosting, no key, offline showroom) the session quietly falls back to
 // palettes from the local weights and to the journey's own photos.
@@ -1491,11 +1515,11 @@ function choices() {
     approaches: S.approaches.map(k => ARCH[k].label),
   };
 }
-// Fired when the brand is chosen: the proposal is written while the AI screen reads the choices
+// Fired after the languages: the palettes are written while the screen moves on
 function startProposal() {
   const gen = AI.gen;
-  AI.propJob = AI.on && S.brand
-    ? withTimeout(api('proposal', { typology:S.type, brand:S.brand, choices:choices() }), 30000)
+  AI.propJob = AI.on
+    ? withTimeout(api('proposal', { typology:S.type, choices:choices() }), 30000)
         .then(pr => (gen === AI.gen ? (AI.proposal = pr) : null))
         .catch(e => { console.warn('AI non disponibile, versione locale:', e.message); if (gen === AI.gen) AI.on = false; return null; })
     : Promise.resolve(null);
@@ -1530,7 +1554,7 @@ function startImages() {
 
 // ── LOCAL PROPOSAL ──
 // What the AI would compose, from the local weights: three palettes from the
-// three strongest languages, in the chosen brand's nearest catalogue colours.
+// three strongest languages. No brand yet: brandPals() gives them its codes.
 function nearest(hex) {
   const cols = CAT?.marchi[S.brand]?.colori;
   if (!cols) return null;
@@ -1540,6 +1564,18 @@ function nearest(hex) {
   return best;
 }
 const localProducts = k => PRODUCTS[k].map(x => ({ name:x.n, code:'', where:x.w, why:x.t, color:x.sw }));
+// The chosen brand turns every colour into its nearest catalogue colour, with the
+// code to order, and the products into that brand's ones for the palette's language.
+// ponytail: plain RGB distance; on a real catalogue of thousands of colours ask the AI to pick instead.
+function brandPals() {
+  const prods = CAT?.marchi[S.brand]?.prodotti || [];
+  S.pals = S.pals.map(p => {
+    const colors = p.colors.map(c => { const n = nearest(c.hex); return n ? { code:n.code, name:n.name, hex:n.hex } : c; });
+    const own = prods.filter(x => x.linguaggi.includes(ARCH[p.key]?.label)).slice(0, 3)
+      .map((x, i) => ({ name:x.name, code:x.code, where:x.dove, why:x.note, color:[0, 2, 3][i] }));
+    return { ...p, colors, products:own.length ? own : p.products };
+  });
+}
 function localProposal() {
   const p = profile();
   const likes = S.liked.filter(i => DECK.includes(i)).length;
@@ -1557,7 +1593,7 @@ function localProposal() {
     ].filter(Boolean),
     palettes:ranked().slice(0, 3).map(([k]) => ({
       key:k, name:ARCH[k].noun, description:ARCH[k].desc,
-      colors:ARCH[k].pal.map(([n, h]) => { const c = nearest(h); return c ? { code:c.code, name:c.name, hex:c.hex } : { code:'', name:n, hex:h }; }),
+      colors:ARCH[k].pal.map(([n, h]) => ({ code:'', name:n, hex:h })),
       products:localProducts(k),
     })),
   };
@@ -1596,7 +1632,8 @@ $('ap-done').addEventListener('click', () => {
   if (!S.approaches.length) return;
   add(S.approaches, 4);
   S.decisions++;
-  if (CAT) go('brand'); else { startProposal(); go('pals'); }
+  startProposal();
+  go('pals');
 });
 
 // ── 5 · BRAND ──
@@ -1626,58 +1663,99 @@ function chooseBrand(key) {
   S.brand = key;
   S.decisions++;
   renderBrands();
-  later(() => { brandBusy = false; startProposal(); go('pals'); }, 350);
+  later(() => { brandBusy = false; brandPals(); startImages(); go('ai'); }, 350);
 }
 
 // ── 6 · THE PALETTES ──
-// First half a minute with only "Continua il percorso" and the fan deck: the
-// visitor goes on through the showroom and touches colours and materials.
-// Meanwhile the palettes are composed; when the time is up they appear
-// to be chosen: one, two or all three.
-const PAL_MS = 30000;
+// qr: the palettes to read, and a QR that takes them onto the phone. When the
+// phone opens it the screen says "Continua il percorso" with the fan deck for
+// as long as the visitor tours the samples; after a minute a button brings
+// back the palettes to be chosen (one, two or all three), then the brand.
+// The two showroom monitors mirror each other: the visitor comes back to either.
+const WAIT_MS = 60000;   // the wait before "Continua il percorso" shows up
+// The phone that scans the QR opens this page in view mode (#v=…): only the palettes
+const VIEW = /^#v=/.test(location.hash);
 let aiTimers = [];
 async function enterPals() {
   aiTimers.forEach(clearTimeout); aiTimers = [];
+  if (VIEW) { renderPalCards(); palsMode('qr'); return; }
   const mine = session;
   S.picks = []; S.pals = [];
-  AI.minuteOver = false;
-  palsMode(1);
-  aiTimers.push(setTimeout(minuteOver, PAL_MS));
+  palsMode('qr');
   const pr = await AI.propJob;   // never rejects: null when the AI is not there
   if (mine !== session || step !== 'pals') return;
   const p = pr || localProposal();
   // AI palettes speak no language of their own: the photos used without AI follow the ranking
   const keys = ranked().map(x => x[0]);
-  S.pals = p.palettes.map((x, i) => ({ key:keys[i], ...x }));
+  S.pals = p.palettes.map((x, i) => ({ key:keys[i], products:localProducts(keys[i]), ...x }));
   S.prop = { name:p.name, description:p.description };
   S.insights = p.insights;
   renderPalCards();
-  palsMode(AI.minuteOver ? 2 : 1);
+  palsMode('qr');
+  showPalsQR();
 }
-function minuteOver() {
-  AI.minuteOver = true;
-  if (step === 'pals') palsMode(S.pals.length ? 2 : 0);
-}
-// 1: the wait (fan deck until the palettes are there, then the palettes to read) · 0: wait over, palettes still being composed · 2: choose
-function palsMode(n) {
-  const ready = S.pals.length > 0, look = n === 1 && ready;
-  $('s-pals').classList.toggle('center', n === 0 || (n === 1 && !ready));
-  $('pals-wait').hidden = n !== 0;
-  $('pals').hidden = !(n === 2 || look);
-  $('pals').inert = look;
-  $('fan').hidden = !(n === 1 && !ready);
-  if (n === 1 && !ready) paintWait();
-  $('pals-actions').hidden = n !== 2;
+function palsMode(m) {
+  AI.palsMode = m;
+  const ready = S.pals.length > 0, wait = m === 'wait', look = m === 'qr';
+  $('s-pals').classList.toggle('center', wait);
+  $('pals-wait').hidden = ready;
+  $('pals').hidden = !ready || wait;
+  $('pals').classList.toggle('look', look);
+  $('pals-qr').hidden = !(look && ready) || VIEW;
+  $('fan').hidden = !wait;
+  $('wait-go').hidden = true;
+  if (wait) paintWait();
+  $('pals-actions').hidden = m !== 'choose' || !ready;
   const many = S.pals.length !== 1;
-  $('pals-title').textContent = n === 1 ? 'Continua il percorso' : many ? 'Scegli la tua palette' : 'La tua palette';
-  $('pals-sub').textContent = look ? `Cerca questi codici ${brandName()} nello showroom e tocca i colori con mano.`
-    : n === 1 ? 'Scopri nello showroom colori e materiali e toccali con mano. Stiamo caricando le tue scelte.'
-    : n === 0 ? '' : many ? `Puoi sceglierne una o tutte e ${S.pals.length === 3 ? 'tre' : 'due'}.` : 'Toccala per continuare.';
-  if (n === 2) updatePickBtn();
+  $('pals-title').textContent = wait ? 'Continua il percorso' : look ? 'Le tue palette' : many ? 'Scegli la tua palette' : 'La tua palette';
+  $('pals-sub').textContent = !ready ? ''
+    : VIEW ? 'Cerca questi colori nello showroom e toccali con mano.'
+    : wait ? 'Scopri nello showroom colori e materiali e toccali con mano.'
+    : look ? 'Nate dalle tue scelte. Tra poco le vedrai dal vivo nello showroom.'
+    : many ? `Puoi sceglierne una o tutte e ${S.pals.length === 3 ? 'tre' : 'due'}.` : 'Toccala per continuare.';
+  if (m === 'choose' && ready) updatePickBtn();
 }
-// The fan deck shows the colours of the visitor's strongest languages
+// The QR carries the palettes in the link (names and colours, a few hundred
+// characters) and an id: the screen asks the server whether the phone opened it.
+function palsLink(id) {
+  const tidy = t => String(t).replace(/[:;,.~]/g, ' ').trim().slice(0, 24);
+  const v = S.pals.map(p => tidy(p.name) + ':' + p.colors.map(c => tidy(c.name) + '~' + c.hex.slice(1)).join(',')).join(';');
+  return `${location.origin}${location.pathname}?scan=${id}#v=${encodeURIComponent(v)}`;
+}
+function readPalsLink(v) {
+  try {
+    return decodeURIComponent(v).split(';').slice(0, 3).map(part => {
+      const [name, cols = ''] = part.split(':');
+      const colors = cols.split(',').slice(0, 5).map(x => { const [n, h] = x.split('~'); return /^[0-9A-F]{6}$/i.test(h) ? { code:'', name:n, hex:'#' + h } : null; }).filter(Boolean);
+      return { key:'neutro', name:name.slice(0, 24), description:'', colors, products:[] };
+    }).filter(p => p.colors.length);
+  } catch { return []; }
+}
+function showPalsQR() {
+  const id = Math.random().toString(36).slice(2, 12).padEnd(8, '0');
+  const box = $('pals-qr-code');
+  box.textContent = '';
+  if (window.QRCode) new QRCode(box, { text:palsLink(id), width:512, height:512, colorDark:'#000000', colorLight:'#ffffff', correctLevel:QRCode.CorrectLevel.L });
+  else $('pals-qr').hidden = true;
+  const mine = session;
+  const t = setInterval(async () => {
+    if (mine !== session || step !== 'pals' || AI.palsMode !== 'qr') return clearInterval(t);
+    try {
+      const r = await (await fetch('api/scan?id=' + id)).json();
+      if (r.scanned && mine === session && AI.palsMode === 'qr') startWait();
+    } catch {}
+  }, 1500);
+  aiTimers.push(t);
+}
+function startWait() {
+  palsMode('wait');
+  aiTimers.push(setTimeout(() => { if (step === 'pals' && AI.palsMode === 'wait') $('wait-go').hidden = false; }, WAIT_MS));
+}
+$('wait-go').addEventListener('click', () => palsMode('choose'));
+$('pals-qr-skip').addEventListener('click', startWait);
+// The fan deck shows the colours of the visitor's palettes
 function paintWait() {
-  const cols = ranked().slice(0, 3).flatMap(([k]) => ARCH[k].pal.slice(1, 4).map(x => x[1])).slice(0, 7);
+  const cols = S.pals.flatMap(p => p.colors.slice(1, 3).map(c => c.hex));
   const fan = $('fan');
   fan.textContent = '';
   cols.forEach((c, i) => {
@@ -1708,8 +1786,9 @@ function renderPalCards() {
       const dt = document.createElement('span'); dt.className = 'pal-dot';
       const ci = document.createElement('i'); ci.style.background = c.hex;
       const nm = document.createElement('b'); nm.textContent = c.name;
-      const cd = document.createElement('small'); cd.textContent = c.code || c.hex;
-      dt.append(ci, nm, cd); dots.appendChild(dt);
+      dt.append(ci, nm);
+      if (c.code) { const cd = document.createElement('small'); cd.textContent = c.code; dt.appendChild(cd); }
+      dots.appendChild(dt);
     });
     b.append(head, sws, dots);
     b.addEventListener('click', () => {
@@ -1736,8 +1815,7 @@ $('pick-all').addEventListener('click', () => {
 $('pals-done').addEventListener('click', () => {
   if (!S.picks.length) return;
   S.picks.sort((a, b) => a - b);
-  startImages();
-  go('ai');
+  if (CAT) go('brand'); else { startImages(); go('ai'); }
 });
 
 // ── 7 · AI READING ──
@@ -2053,8 +2131,16 @@ function bumpIdle() {
 
 // ── BOOT ──
 // a shared link needs the catalogue to turn its codes back into colours
-const m = location.hash.match(/^#p=(.+)$/);
-if (m) catReady.then(() => go(decode(m[1]) ? 'result' : 'intro')); else go('intro');
+// the phone that scanned the palettes' QR tells the screen, then shows them
+const m = location.hash.match(/^#p=(.+)$/), v = location.hash.match(/^#v=(.+)$/);
+if (m) catReady.then(() => go(decode(m[1]) ? 'result' : 'intro'));
+else if (v) {
+  const id = new URLSearchParams(location.search).get('scan');
+  if (id) fetch('api/scan', { method:'POST', headers:{ 'content-type':'application/json' }, body:JSON.stringify({ id }) }).catch(() => {});
+  S.pals = readPalsLink(v[1]); S.shared = true;
+  go(S.pals.length ? 'pals' : 'intro');
+}
+else go('intro');
 </script>
 </body>
 </html>

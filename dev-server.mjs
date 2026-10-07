@@ -25,7 +25,7 @@ if (existsSync(join(ROOT, '.env'))) {
 
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json',
   '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json' };
-const API = new Set(['room', 'proposal']);
+const API = new Set(['room', 'proposal', 'scan']);
 
 http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
