@@ -414,7 +414,7 @@ img{display:block}
   width:1.75rem;height:1.75rem;flex:0 0 auto;padding:0.3125rem;border-radius:50%;
   border:1.5px solid var(--line);color:transparent;transition:background .15s,color .15s,border-color .15s;
 }
-.ap[aria-pressed="true"] svg,.pal[aria-pressed="true"] svg,.brand[aria-pressed="true"] svg{background:var(--tint);border-color:var(--tint);color:var(--on-tint)}
+.ap[aria-pressed="true"] svg,.pal.on svg,.brand[aria-pressed="true"] svg{background:var(--tint);border-color:var(--tint);color:var(--on-tint)}
 .ap+.ap{border-top:1px solid var(--separator)}
 /* step 5: one tile per brand, the same card as the palettes, the logo in the middle */
 .brands{flex:1 1 auto;min-height:0;display:grid;grid-auto-rows:1fr;gap:0.75rem}
@@ -491,7 +491,19 @@ img{display:block}
   -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
   transition:border-color .2s;animation:rise .5s cubic-bezier(0.32,0.72,0,1) backwards;
 }
-.pal[aria-pressed="true"]{border-color:var(--tint)}
+.pal.on{border-color:var(--tint)}
+/* the whole card picks the palette; the content lies over it and lets touches through, except the colours */
+.pal-hit{position:absolute;inset:0;border-radius:inherit}
+.pal-head,.pal-sws,.pal-dots{position:relative;pointer-events:none}
+.pal-dot{padding:0.25rem 0.125rem;border-radius:0.75rem;transition:background .15s}
+.pal-dot:active{background:rgba(255,255,255,0.1)}
+/* "Cambia colori" opens one palette for editing: its colours ring in amber and take touches */
+.pal-edit{position:relative;align-self:flex-start;min-height:2.25rem;padding:0 1rem;border-radius:999px;background:var(--fill);font-size:0.875rem;font-weight:500}
+.pals.look .pal-edit{display:none}
+.pal.editing .pal-dots{background:rgba(255,255,255,0.1)}
+.pal.editing .pal-dot{pointer-events:auto}
+.pal.editing .pal-dot i{outline:2px solid var(--tint);outline-offset:2px}
+.pal.editing .pal-edit{background:var(--tint);color:var(--on-tint)}
 .pal-head{display:flex;align-items:flex-start;gap:0.75rem}
 .pal-body{flex:1 1 auto;min-width:0}
 .pal-name{display:block;font-size:1.25rem;font-weight:500;line-height:1.25}
@@ -506,6 +518,16 @@ img{display:block}
 /* under them, one dot per colour with name and code: what to ask for at the counter */
 .pal-dots{display:grid;grid-template-columns:repeat(5,1fr);gap:0.25rem;padding:0.5rem 0.5rem 0.4375rem;border-radius:1.25rem;background:rgba(255,255,255,0.06)}
 .pal-dot{display:flex;flex-direction:column;align-items:center;min-width:0;text-align:center}
+/* the colour sheet: every colour of the app, by language, to swap one the visitor saw live */
+.cfam+.cfam{margin-top:1rem}
+.cfam-h{font-size:0.875rem;font-weight:500;color:var(--label-2);margin-bottom:0.375rem}
+.cfam-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0.25rem}
+.cpick{display:flex;flex-direction:column;align-items:center;gap:0.375rem;min-width:0;padding:0.5rem 0.125rem;border-radius:0.875rem;font-size:0.75rem;font-weight:500;transition:background .15s}
+.cpick:active{background:rgba(255,255,255,0.08)}
+.cpick i{width:2.75rem;height:2.75rem;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.18)}
+.cpick.on i{box-shadow:inset 0 0 0 1px rgba(255,255,255,0.18),0 0 0 0.1875rem #1c1c1c,0 0 0 0.375rem var(--tint)}
+.cpick span{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
 .pal-dot i{width:1.5rem;height:1.5rem;border-radius:50%;margin-bottom:0.3125rem;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.18)}
 .pal-dot b{max-width:100%;font-size:0.6875rem;font-weight:500;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pal-dot small{font-size:0.625rem;color:var(--label-3);font-variant-numeric:tabular-nums}
@@ -519,11 +541,11 @@ img{display:block}
   border-radius:var(--r-card);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
   -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
 }
-.pals-qr .qr{flex:0 0 auto;width:8.5rem;height:8.5rem;margin:0;padding:0.5rem;border-radius:0.875rem}
+.pals-qr .qr{flex:0 0 auto;width:6rem;height:6rem;margin:0;padding:0.375rem;border-radius:0.625rem}
 .pals-qr-body{flex:1 1 auto;min-width:0}
-.pals-qr-title{font-size:1.25rem;font-weight:500;line-height:1.25}
-.pals-qr-text{font-size:0.9375rem;line-height:1.4;color:var(--label-2);margin-top:0.25rem}
-.pals-qr-skip{margin-top:0.5rem;padding:0.375rem 0;font-size:0.875rem;font-weight:500;color:var(--label-2);text-decoration:underline;text-underline-offset:0.2em}
+.pals-qr-title{font-size:1.0625rem;font-weight:500;line-height:1.25}
+.pals-qr-text{font-size:0.8125rem;line-height:1.4;color:var(--label-2);margin-top:0.125rem}
+.pals-qr-skip{margin-top:0.25rem;padding:0.375rem 0;font-size:0.75rem;font-weight:500;color:var(--label-2);text-decoration:underline;text-underline-offset:0.2em}
 /* the wait in the showroom: a centred message and the fan deck in the palettes' colours */
 #s-pals.center{justify-content:center;text-align:center}
 #s-pals.center .screen-head{margin-bottom:0}
@@ -835,6 +857,18 @@ img{display:block}
   </section>
 
   <!-- Profile sheet: what the AI has understood so far -->
+  <div class="sheet" id="color-sheet" role="dialog" aria-modal="false" aria-labelledby="color-title">
+    <div class="sheet-grabber" id="color-grabber"></div>
+    <button class="sheet-close" id="color-close" type="button" aria-label="Chiudi">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
+    </button>
+    <div class="sheet-content">
+      <h2 class="sheet-title" id="color-title">Cambia colore</h2>
+      <p class="sheet-text" id="color-text"></p>
+      <div id="color-fams"></div>
+    </div>
+  </div>
+
   <div class="sheet" id="profile-sheet" role="dialog" aria-modal="false" aria-labelledby="profile-title">
     <div class="sheet-grabber" id="profile-grabber"></div>
     <button class="sheet-close" id="profile-close" type="button" aria-label="Chiudi">
@@ -1712,7 +1746,7 @@ function palsMode(m) {
     : VIEW ? 'Cerca questi colori nello showroom e toccali con mano.'
     : wait ? 'Scopri nello showroom colori e materiali e toccali con mano.'
     : look ? 'Nate dalle tue scelte. Tra poco le vedrai dal vivo nello showroom.'
-    : many ? `Puoi sceglierne una o tutte e ${S.pals.length === 3 ? 'tre' : 'due'}.` : 'Toccala per continuare.';
+    : many ? `Puoi sceglierne una o tutte e ${S.pals.length === 3 ? 'tre' : 'due'}, e cambiarne i colori.` : 'Toccala per continuare.';
   if (m === 'choose' && ready) updatePickBtn();
 }
 // The QR carries the palettes in the link (names and colours, a few hundred
@@ -1764,41 +1798,101 @@ function paintWait() {
     fan.appendChild(st);
   });
 }
+let editPal = -1;   // the palette open for editing, one at a time
 function renderPalCards() {
   const box = $('pals');
   box.textContent = '';
+  editPal = -1;
   S.pals.forEach((p, i) => {
-    const b = document.createElement('button');
-    b.type = 'button'; b.className = 'pal';
-    b.setAttribute('aria-pressed', 'false');
-    b.style.animationDelay = `${i * 0.12}s`;
-    const head = document.createElement('span'); head.className = 'pal-head';
-    const body = document.createElement('span'); body.className = 'pal-body';
-    const n = document.createElement('span'); n.className = 'pal-name'; n.textContent = p.name;
-    const d = document.createElement('span'); d.className = 'pal-desc'; d.textContent = p.description;
-    body.append(n, d);
-    head.appendChild(body);
-    head.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 13 4.5 4.5L19 7"/></svg>');
-    const sws = document.createElement('span'); sws.className = 'pal-sws';
-    const dots = document.createElement('span'); dots.className = 'pal-dots';
-    p.colors.forEach(c => {
-      const chip = document.createElement('i'); chip.style.background = c.hex; sws.appendChild(chip);
-      const dt = document.createElement('span'); dt.className = 'pal-dot';
-      const ci = document.createElement('i'); ci.style.background = c.hex;
-      const nm = document.createElement('b'); nm.textContent = c.name;
-      dt.append(ci, nm);
-      if (c.code) { const cd = document.createElement('small'); cd.textContent = c.code; dt.appendChild(cd); }
-      dots.appendChild(dt);
-    });
-    b.append(head, sws, dots);
-    b.addEventListener('click', () => {
-      const at = S.picks.indexOf(i);
-      if (at >= 0) S.picks.splice(at, 1); else S.picks.push(i);
-      b.setAttribute('aria-pressed', String(at < 0));
-      updatePickBtn();
-    });
-    box.appendChild(b);
+    const card = palCard(p, i);
+    card.style.animationDelay = `${i * 0.12}s`;
+    box.appendChild(card);
   });
+}
+function palCard(p, i) {
+  const card = document.createElement('div');
+  card.className = 'pal' + (S.picks.includes(i) ? ' on' : '') + (i === editPal ? ' editing' : '');
+  const hit = document.createElement('button');
+  hit.type = 'button'; hit.className = 'pal-hit';
+  hit.setAttribute('aria-label', `Palette ${p.name}`);
+  hit.setAttribute('aria-pressed', String(S.picks.includes(i)));
+  hit.addEventListener('click', () => {
+    const at = S.picks.indexOf(i);
+    if (at >= 0) S.picks.splice(at, 1); else S.picks.push(i);
+    markPicks();
+  });
+  const head = document.createElement('span'); head.className = 'pal-head';
+  const body = document.createElement('span'); body.className = 'pal-body';
+  const n = document.createElement('span'); n.className = 'pal-name'; n.textContent = p.name;
+  const d = document.createElement('span'); d.className = 'pal-desc'; d.textContent = p.description;
+  body.append(n, d);
+  head.appendChild(body);
+  head.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 13 4.5 4.5L19 7"/></svg>');
+  const sws = document.createElement('span'); sws.className = 'pal-sws';
+  const dots = document.createElement('span'); dots.className = 'pal-dots';
+  p.colors.forEach((c, j) => {
+    const chip = document.createElement('i'); chip.style.background = c.hex; sws.appendChild(chip);
+    const dt = document.createElement('button'); dt.type = 'button'; dt.className = 'pal-dot';
+    dt.setAttribute('aria-label', `Cambia ${c.name}`);
+    const ci = document.createElement('i'); ci.style.background = c.hex;
+    const nm = document.createElement('b'); nm.textContent = c.name;
+    dt.append(ci, nm);
+    if (c.code) { const cd = document.createElement('small'); cd.textContent = c.code; dt.appendChild(cd); }
+    dt.addEventListener('click', () => openColors(i, j));
+    dots.appendChild(dt);
+  });
+  const edit = document.createElement('button');
+  edit.type = 'button'; edit.className = 'pal-edit';
+  edit.textContent = i === editPal ? 'Fatto' : 'Cambia colori';
+  edit.addEventListener('click', () => {
+    editPal = editPal === i ? -1 : i;
+    [...$('pals').children].forEach((c, k) => {
+      c.classList.toggle('editing', k === editPal);
+      c.querySelector('.pal-edit').textContent = k === editPal ? 'Fatto' : 'Cambia colori';
+    });
+  });
+  card.append(hit, head, sws, dots, edit);
+  return card;
+}
+function markPicks() {
+  [...$('pals').children].forEach((card, i) => {
+    const on = S.picks.includes(i);
+    card.classList.toggle('on', on);
+    card.querySelector('.pal-hit').setAttribute('aria-pressed', String(on));
+  });
+  updatePickBtn();
+}
+// Seen a colour live that they like more: any colour of the app, by language,
+// takes that place. The brand comes later and turns it into its nearest code.
+// ponytail: the app's 35 colours; with the real catalogues, list (or search) theirs here.
+function openColors(i, j) {
+  const pal = S.pals[i], cur = pal.colors[j];
+  $('color-text').textContent = `Al posto di ${cur.name} nella palette ${pal.name}: scegli il colore che hai visto dal vivo.`;
+  const box = $('color-fams');
+  box.textContent = '';
+  AP_ORDER.forEach(k => {
+    const fam = document.createElement('div'); fam.className = 'cfam';
+    const h = document.createElement('p'); h.className = 'cfam-h'; h.textContent = ARCH[k].label;
+    const grid = document.createElement('div'); grid.className = 'cfam-grid';
+    ARCH[k].pal.forEach(([name, hex]) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'cpick' + (hex.toLowerCase() === cur.hex.toLowerCase() ? ' on' : '');
+      const sw = document.createElement('i'); sw.style.background = hex;
+      const nm = document.createElement('span'); nm.textContent = name;
+      b.append(sw, nm);
+      b.addEventListener('click', () => {
+        pal.colors[j] = { code:'', name, hex };
+        const old = $('pals').children[i], card = palCard(pal, i);
+        card.style.animation = 'none';
+        old.replaceWith(card);
+        closeSheets();
+      });
+      grid.appendChild(b);
+    });
+    fam.append(h, grid);
+    box.appendChild(fam);
+  });
+  openSheet($('color-sheet'));
 }
 function updatePickBtn() {
   const n = S.picks.length;
@@ -1809,8 +1903,7 @@ function updatePickBtn() {
 }
 $('pick-all').addEventListener('click', () => {
   S.picks = S.pals.map((_, i) => i);
-  [...$('pals').children].forEach(b => b.setAttribute('aria-pressed', 'true'));
-  updatePickBtn();
+  markPicks();
 });
 $('pals-done').addEventListener('click', () => {
   if (!S.picks.length) return;
@@ -2063,10 +2156,10 @@ $('profile-open').addEventListener('click', () => {
 });
 
 // ── SHEETS ──
-const sheets = [$('profile-sheet'), $('share-sheet')];
+const sheets = [$('profile-sheet'), $('share-sheet'), $('color-sheet')];
 function openSheet(s) { sheets.forEach(x => x.classList.toggle('active', x === s)); }
 function closeSheets() { sheets.forEach(x => x.classList.remove('active')); }
-['profile-close', 'profile-done', 'share-close'].forEach(id => $(id).addEventListener('click', closeSheets));
+['profile-close', 'profile-done', 'share-close', 'color-close'].forEach(id => $(id).addEventListener('click', closeSheets));
 function makeDismissable(sheet, grabber) {
   let startY = 0, dy = 0, startT = 0, dragging = false;
   grabber.addEventListener('pointerdown', e => {
@@ -2089,6 +2182,7 @@ function makeDismissable(sheet, grabber) {
   grabber.addEventListener('pointercancel', end);
 }
 makeDismissable($('profile-sheet'), $('profile-grabber'));
+makeDismissable($('color-sheet'), $('color-grabber'));
 makeDismissable($('share-sheet'), $('share-grabber'));
 
 // ── RESTART ──
