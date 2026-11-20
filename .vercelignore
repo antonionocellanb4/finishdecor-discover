@@ -1,0 +1,4 @@
+# Vercel CLI does not read .gitignore: without this, .env (the keys) would be uploaded and served as a public file
+.env
+.env.*
+dev-server.mjs
