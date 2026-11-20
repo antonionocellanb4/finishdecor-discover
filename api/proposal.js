@@ -73,17 +73,16 @@ function validate(raw) {
   };
 }
 
-// AI_MOCK: a believable answer from the example catalogue's families, to try the flow with no key
-function mock(choices) {
-  const colori = Object.values(catalogo.marchi)[0].colori;
-  const fams = (choices?.languages || []).map(l => clean(l.name, 20)).concat('Neutro', 'Caldo', 'Naturale');
+// AI_MOCK: a believable answer from three families of the Colour Wall, to try the flow with no key
+function mock() {
+  const colori = catalogo.marchi.sikkens.colori;
   return validate({
     name: 'Prova senza AI',
     description: 'Questa è una risposta di prova (AI_MOCK=1): il testo vero lo scrive il modello quando c\'è la chiave.',
     insights: ['Osservazione di prova 1.', 'Osservazione di prova 2.', 'Osservazione di prova 3.', 'Osservazione di prova 4.'],
-    palettes: [...new Set(fams)].filter(f => colori.some(c => c.famiglia === f)).slice(0, 3).map((f, i) => ({
-      name: `Palette di prova ${i + 1}`, description: `Costruita dalla famiglia ${f}.`,
-      colors: colori.filter(c => c.famiglia === f).map(({ name, hex }) => ({ name, hex })),
+    palettes: ['Sage', 'Red Terra', 'Greige'].map((f, i) => ({
+      name: `Palette di prova ${i + 1}`, description: `Costruita dalla famiglia ${f} della Colour Wall.`,
+      colors: colori.filter(c => c.famiglia === f).slice(1, 6).map(({ name, hex }) => ({ name, hex })),
     })),
   });
 }
@@ -93,7 +92,7 @@ export default async function handler(req, res) {
   try {
     const { typology, choices } = req.body || {};
     const tipo = checkTipo(typology);
-    if (MOCK) { await sleep(2000); return send(res, 200, mock(choices)); }
+    if (MOCK) { await sleep(2000); return send(res, 200, mock()); }
     const json = await gemini(TEXT_MODEL, {
       systemInstruction: { parts: [{ text: SYSTEM }] },
       contents: [{ role: 'user', parts: [{ text: brief(tipo, choices) }] }],
