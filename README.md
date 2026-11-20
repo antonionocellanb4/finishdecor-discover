@@ -28,9 +28,14 @@ La pillola "Profilo" in alto mostra il profilo che si forma a ogni scelta.
 **Il QR delle palette.** Il link porta le palette con sé (nomi e colori, circa
 300 caratteri dopo `#v=`): il telefono le mostra senza server. Porta anche un
 `?scan=` casuale: aprendolo il telefono avvisa `api/scan`, e lo schermo, che chiede
-ogni 1,5 s, passa all'attesa. `api/scan` tiene gli avvisi in memoria: va bene col
-server locale sul PC dello showroom; su Vercel serve un archivio condiviso
-(Vercel KV / Upstash). Per provarlo col telefono in locale apri la pagina
+ogni 1,5 s, passa all'attesa. Su Vercel telefono e schermo raggiungono funzioni
+diverse, quindi l'avviso sta nell'archivio condiviso (Upstash Redis, collegato da
+Vercel → Storage: aggiunge `KV_REST_API_URL` e `KV_REST_API_TOKEN`); senza
+archivio resta in memoria, che basta col server locale sul PC dello showroom.
+Nello stesso archivio stanno i limiti delle chiamate a pagamento (`limit` in
+`api/_ai.js`): proposta 30 l'ora per visitatore e 200 al giorno, immagini 120
+l'ora e 1200 al giorno, prova sulla stanza 12 l'ora e 200 al giorno.
+Per provarlo col telefono in locale apri la pagina
 dall'indirizzo di rete del PC (es. `http://192.168.1.20:8137`), non da `localhost`,
 con telefono e PC sulla stessa rete.
 
@@ -76,14 +81,14 @@ Funzioni server in `api/` (più `api/scan.js` per il QR delle palette), che Verc
 
 | File | Quando | Cosa fa |
 |---|---|---|
-| `api/proposal.js` | dopo il linguaggio | scrive profilo, osservazioni e **tre palette** di colori liberi (nome + hex) |
-| `api/room.js` | dopo la scelta delle palette | per ogni palette scelta disegna tre spazi diversi della tipologia (Gemini, modello immagini) e un moodboard |
+| `api/proposal.js` | dopo il linguaggio | scrive profilo, osservazioni e **tre palette** di colori liberi (nome + hex), con Google Gemini su Comfy Cloud |
+| `api/room.js` | dopo la scelta delle palette | per ogni palette scelta disegna tre spazi diversi della tipologia e un moodboard, con Nano Banana su Comfy Cloud (circa 15 s a immagine) |
 | `api/repaint.js` | sul telefono, "Prova i colori sulla tua stanza" | carica la foto su **Comfy Cloud** e ne ridipinge le pareti con **GPT Image 2** (stesso nodo e stessa chiave di ManyTask e LeadWin). Circa 40 secondi: la pagina chiede ogni 3 s se è pronta |
 
-- **Le chiavi non entrano mai nella pagina.** Stanno in `GEMINI_API_KEY` e
+- **Una sola chiave, mai nella pagina.** Tutta l'AI passa da Comfy Cloud con
   `COMFY_API_KEY`: in locale nel file `.env` (copia `.env.example`), online
-  nelle Environment Variables di Vercel. Senza `COMFY_API_KEY` il telefono dice
-  "La prova sulla tua stanza non è ancora attiva".
+  nelle Environment Variables di Vercel. Senza chiave il percorso usa le palette
+  calcolate in locale e il telefono dice "La prova sulla tua stanza non è ancora attiva".
 - **L'AI non può inventare colori.** Appena composte le palette, la pagina porta
   ogni colore sul colore della Colour Wall più vicino alla vista (distanza CIELAB,
   ogni colore del muro al massimo una volta per palette), e i prodotti sono quelli
@@ -93,8 +98,9 @@ Funzioni server in `api/` (più `api/scan.js` per il QR delle palette), che Verc
   linguaggi più forti e le foto del percorso.
 - **Costi.** 1 testo + 4 immagini per ogni palette scelta (da 4 a 12 per cliente),
   3 alla volta (`IMG_PARALLEL`). Le palette non scelte non vengono disegnate.
-- **Modelli:** `GEMINI_IMAGE_MODEL` e `GEMINI_TEXT_MODEL` in `.env` per cambiarli
-  senza toccare il codice. I nomi di default vanno verificati con la chiave.
+- **Modelli:** si cambiano nei file di `api/`. I nomi validi sono quelli dei nodi
+  di Comfy (`GeminiNode`, `GeminiImageNode`, `OpenAIGPTImage1`), elencati da
+  `/api/object_info` di Comfy Cloud.
 
 ## Avviare in locale
 
@@ -105,7 +111,7 @@ node dev-server.mjs            # http://localhost:8137
 Serve Node 20 o più recente, nessuna dipendenza da installare. Il server
 mostra la pagina e fa girare `api/` come farebbe Vercel. All'avvio dice se
 l'AI è attiva. `AI_MOCK=1 node dev-server.mjs` prova tutto il flusso senza
-chiamare Gemini: le immagini sono una foto fissa e la proposta è di prova.
+chiamare Comfy: le immagini sono una foto fissa e la proposta è di prova.
 
 Aperta con doppio clic sul file, la pagina funziona lo stesso ma senza AI e
 con i colori dell'app al posto della Colour Wall (il catalogo non si può leggere da file).
@@ -116,8 +122,9 @@ con i colori dell'app al posto della Colour Wall (il catalogo non si può legger
   **colori sono quelli veri della Colour Wall 2025**: 24 famiglie per 8 livelli
   (da Deep a Delicate), 192 colori, nomi e valori presi dal sito sikkens.it
   (novembre 2026). Sul muro un colore si cerca per nome, quindi non c'è codice.
-  **I prodotti sono ancora di esempio** (codici SIK-P inventati).
-- `api/_gemini.js`, `TIPI` — il nome di ogni tipologia per l'AI e i tre spazi da disegnare (stesso ordine di `spaces` in `TYPES`).
+  **I prodotti sono quelli Sikkens per interni** del sito (pitture murali, effetti
+  decorativi, uno smalto), tre per ogni linguaggio: l'ordine nella lista decide quali escono.
+- `api/_ai.js`, `TIPI` — il nome di ogni tipologia per l'AI e i tre spazi da disegnare (stesso ordine di `spaces` in `TYPES`).
 
 Il resto è in `index.html`, nello script:
 

@@ -1,4 +1,4 @@
-# La chiave Gemini non deve mai finire nel repo
+# Le chiavi (.env) non devono mai finire nel repo
 .env
 .env.*
 !.env.example

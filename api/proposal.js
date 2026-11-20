@@ -1,11 +1,15 @@
 // POST /api/proposal  { typology, choices }
 // The model reads the visitor's choices and composes three palettes of free
-// colours (name + hex). The brand is chosen later, at station 2: the page then
-// turns every colour into that brand's nearest catalogue colour, so the codes
-// the visitor sees always exist.
+// colours (name + hex). The page then turns every colour into the nearest
+// colour of the Colour Wall, so the colours the visitor sees always exist.
+// The model is Google Gemini, run on Comfy Cloud (node GeminiNode); the text
+// comes back through a PreviewAny node.
 
 import catalogo from '../data/catalogo.js';
-import { gemini, textOut, checkTipo, clean, send, sleep, HttpError, TEXT_MODEL, MOCK, TIPI } from './_gemini.js';
+import { submit, waitFor, seed, limit, checkTipo, clean, send, sleep, HttpError, MOCK, TIPI } from './_ai.js';
+
+// Comfy's list of Gemini models: the GeminiNode entry of /api/object_info
+const TEXT_MODEL = 'gemini-3-1-flash-lite';
 
 const SYSTEM = `Sei il consulente colore di FinishDecor, specialisti delle finiture d'interni.
 Un cliente ha appena completato un percorso sul monitor dello showroom. Ricevi le sue scelte e componi la sua proposta.
@@ -15,32 +19,15 @@ Regole:
 - name: nome del profilo creativo, 2-4 parole, evocativo.
 - description: 2-3 frasi rivolte al cliente (tu), concrete, niente gergo.
 - insights: 4 osservazioni brevi su cosa dicono le sue scelte, una frase ciascuna, in seconda persona.
-- Italiano, tono caldo e professionale.`;
+- Italiano, tono caldo e professionale.
+Rispondi solo con un oggetto JSON valido, senza testo prima o dopo e senza blocchi di codice, in questa forma:
+{"name": "...", "description": "...", "insights": ["..."], "palettes": [{"name": "...", "description": "...", "colors": [{"name": "...", "hex": "#RRGGBB"}]}]}`;
 
-const SCHEMA = {
-  type: 'OBJECT',
-  properties: {
-    name: { type: 'STRING' },
-    description: { type: 'STRING' },
-    insights: { type: 'ARRAY', items: { type: 'STRING' } },
-    palettes: {
-      type: 'ARRAY',
-      items: {
-        type: 'OBJECT',
-        properties: {
-          name: { type: 'STRING' },
-          description: { type: 'STRING' },
-          colors: {
-            type: 'ARRAY',
-            items: { type: 'OBJECT', properties: { name: { type: 'STRING' }, hex: { type: 'STRING' } }, required: ['name', 'hex'] },
-          },
-        },
-        required: ['name', 'description', 'colors'],
-      },
-    },
-  },
-  required: ['name', 'description', 'insights', 'palettes'],
-};
+// The JSON in the model's text, even when it comes wrapped in a code fence
+function parse(text) {
+  const s = String(text), a = s.indexOf('{'), b = s.lastIndexOf('}');
+  try { return JSON.parse(s.slice(a, b + 1)); } catch { throw new HttpError(502, 'Risposta del modello non leggibile'); }
+}
 
 // What the page sent, re-stated as plain checked text for the prompt
 function brief(tipo, choices) {
@@ -73,7 +60,7 @@ function validate(raw) {
   };
 }
 
-// AI_MOCK: a believable answer from three families of the Colour Wall, to try the flow with no key
+// AI_MOCK: a believable answer from three families of the Colour Wall, to try the flow without Comfy
 function mock() {
   const colori = catalogo.marchi.sikkens.colori;
   return validate({
@@ -93,14 +80,13 @@ export default async function handler(req, res) {
     const { typology, choices } = req.body || {};
     const tipo = checkTipo(typology);
     if (MOCK) { await sleep(2000); return send(res, 200, mock()); }
-    const json = await gemini(TEXT_MODEL, {
-      systemInstruction: { parts: [{ text: SYSTEM }] },
-      contents: [{ role: 'user', parts: [{ text: brief(tipo, choices) }] }],
-      generationConfig: { responseMimeType: 'application/json', responseSchema: SCHEMA, temperature: 0.7 },
+    await limit(req, 'proposal', 30, 200);
+    const id = await submit({
+      1: { class_type: 'GeminiNode', inputs: { prompt: brief(tipo, choices), model: TEXT_MODEL, seed: seed(), system_prompt: SYSTEM } },
+      2: { class_type: 'PreviewAny', inputs: { source: ['1', 0] } },
     });
-    let raw;
-    try { raw = JSON.parse(textOut(json)); } catch { throw new HttpError(502, 'Risposta del modello non leggibile'); }
-    send(res, 200, validate(raw));
+    const out = await waitFor(id, 40000);   // the page waits 45 s, then goes on without the AI
+    send(res, 200, validate(parse([].concat(out['2']?.text ?? '').join(''))));
   } catch (e) {
     send(res, e.status || 500, { error: e.message });
   }

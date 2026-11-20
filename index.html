@@ -1165,7 +1165,7 @@ const IMG = [
 // followed by one of these 8 shared inspirations — a style is not made of rooms alone.
 const SHARED = [6, 7, 8, 9, 10, 11, 12, 15];
 // Step 1: the type of space. `own` (its 8 deck pictures) and the pairs' a/b are IMG indices;
-// `spaces` names the three spaces the AI draws, in the order of TIPI.scenes in api/_gemini.js.
+// `spaces` names the three spaces the AI draws, in the order of TIPI.scenes in api/_ai.js.
 const TYPES = {
   casa: { label:'Casa', sub:'Soggiorno, camere, cucina, bagno', spaces:['Soggiorno', 'Camera', 'Cucina'], own:[0, 1, 13, 28, 29, 30, 31, 32],
   pairs:[
@@ -1583,7 +1583,7 @@ function choices() {
 function startProposal() {
   const gen = AI.gen;
   AI.propJob = AI.on
-    ? withTimeout(api('proposal', { typology:S.type, choices:choices() }), 30000)
+    ? withTimeout(api('proposal', { typology:S.type, choices:choices() }), 45000)
         .then(pr => (gen === AI.gen ? (AI.proposal = pr) : null))
         .catch(e => { console.warn('AI non disponibile, versione locale:', e.message); if (gen === AI.gen) AI.on = false; return null; })
     : Promise.resolve(null);
@@ -2225,7 +2225,9 @@ $('try-file').addEventListener('change', async e => {
     tries.splice(tries.indexOf(t), 1);
     tryShown = Math.max(0, tries.length - 1);
     tryState();
-    tryMsg(/COMFY_API_KEY/.test(err.message) ? 'La prova sulla tua stanza non è ancora attiva.' : 'Non è riuscita: riprova tra poco.');
+    tryMsg(/COMFY_API_KEY/.test(err.message) ? 'La prova sulla tua stanza non è ancora attiva.'
+      : /Troppe prove|Limite di oggi/.test(err.message) ? 'Per ora le prove sono finite: riprova più tardi.'
+      : 'Non è riuscita: riprova tra poco.');
   }
 });
 
@@ -2265,6 +2267,7 @@ function decode(code) {
     products:localProducts(keys[i]),
   })).filter(x => x.colors.length);
   if (!S.pals.length) return false;
+  brandPals();   // the same Sikkens products the showroom screen showed
   S.picks = S.pals.map((_, i) => i);
   S.prop = { name:String(d.n || p.name).slice(0, 40), description:`${ARCH[p.pk].desc} ${ARCH[p.sk].desc}` };
   S.decisions = TOTAL;

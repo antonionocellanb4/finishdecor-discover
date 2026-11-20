@@ -1,7 +1,7 @@
 // Il catalogo colori dello showroom. Il marchio è uno solo, Sikkens.
 //
-// I colori sono quelli veri della Colour Wall (sotto); i prodotti sono ancora
-// di ESEMPIO, da sostituire con quelli reali nella stessa forma. Quando il
+// I colori sono quelli veri della Colour Wall (sotto), i prodotti quelli Sikkens
+// per interni del sito, tre per ogni linguaggio (in fondo). Quando il
 // cliente ha scelto le palette, la pagina porta ogni colore sul colore più
 // vicino del muro: l'app mostra solo colori che esistono. La pagina legge
 // questo file, il server lo usa per le risposte di prova (AI_MOCK).
@@ -206,28 +206,25 @@ const COLOUR_WALL = [
   { code: '', name: 'Delicate Grey',      hex: '#EDECE6', famiglia: 'Grey' },
 ];
 
+// I prodotti Sikkens per interni, da sikkens.it (novembre 2026): pitture murali,
+// effetti decorativi e uno smalto. Nomi e descrizioni sono quelli del sito; la
+// scelta di quali proporre per ogni linguaggio è nostra. La pagina prende i primi
+// tre del linguaggio della palette, nell'ordine di questa lista, e li abbina ai
+// colori 1 (pareti), 3 (accento) e 4 (dettagli): l'ordine conta.
 const PRODOTTI = [
-  { code: 'SIK-P01', name: 'Pittura lavabile opaca',            dove: 'Pareti di tutta la casa',            note: 'Resa uniforme, tinte morbide che reggono ogni luce',          linguaggi: ['Neutro', 'Minimale'] },
-  { code: 'SIK-P02', name: 'Velatura decorativa',               dove: 'Parete del soggiorno',               note: 'Profondità leggera senza cambiare tono',                      linguaggi: ['Neutro', 'Sofisticato'] },
-  { code: 'SIK-P03', name: 'Carta da parati effetto lino',      dove: 'Camera da letto',                    note: 'Una trama sottile al posto del colore',                       linguaggi: ['Neutro', 'Naturale'] },
-  { code: 'SIK-P04', name: 'Stucco veneziano',                  dove: 'Ingresso e soggiorno',               note: 'Superficie viva, riflessi caldi',                             linguaggi: ['Caldo', 'Sofisticato'] },
-  { code: 'SIK-P05', name: 'Smalto all\'acqua satinato',        dove: 'Porte e boiserie',                   note: 'Colore pieno che si lava, anche nei passaggi',                linguaggi: ['Caldo', 'Audace'] },
-  { code: 'SIK-P06', name: 'Carta da parati effetto tessuto',   dove: 'Testata del letto',                  note: 'Calore tattile, assorbe il suono',                            linguaggi: ['Caldo', 'Sofisticato'] },
-  { code: 'SIK-P07', name: 'Pittura a calce',                   dove: 'Pareti principali',                  note: 'Traspirante, opaca, con variazioni naturali di tono',         linguaggi: ['Naturale', 'Materico'] },
-  { code: 'SIK-P08', name: 'Pittura all\'argilla',              dove: 'Camera e studio',                    note: 'Minerale, regola l\'umidità',                                 linguaggi: ['Naturale', 'Materico'] },
-  { code: 'SIK-P09', name: 'Carta da parati in fibra naturale', dove: 'Parete d\'accento',                  note: 'Grasscloth e rafia per una texture vegetale',                 linguaggi: ['Naturale'] },
-  { code: 'SIK-P10', name: 'Stucco veneziano lucido',           dove: 'Zona living',                        note: 'Profondità e riflessi che cambiano durante il giorno',       linguaggi: ['Sofisticato'] },
-  { code: 'SIK-P11', name: 'Finitura metallica',                dove: 'Nicchie, dettagli, soffitto',        note: 'Ottone o bronzo spazzolato, a piccole dosi',                  linguaggi: ['Sofisticato', 'Audace'] },
-  { code: 'SIK-P12', name: 'Carta da parati con accenti metallici', dove: 'Sala da pranzo',                 note: 'Un pattern sottile che si accende con la luce',               linguaggi: ['Sofisticato'] },
-  { code: 'SIK-P13', name: 'Pittura ad alta saturazione',       dove: 'Una parete protagonista',            note: 'Pigmenti pieni che non sbiadiscono',                          linguaggi: ['Audace'] },
-  { code: 'SIK-P14', name: 'Smalto colorato',                   dove: 'Porte, infissi e soffitto',          note: 'Il colore anche dove non te lo aspetti',                      linguaggi: ['Audace'] },
-  { code: 'SIK-P15', name: 'Carta da parati a grande pattern',  dove: 'Bagno o corridoio',                  note: 'Piccoli spazi, grande carattere',                             linguaggi: ['Audace'] },
-  { code: 'SIK-P16', name: 'Microcemento',                      dove: 'Pareti e pavimenti, bagno compreso', note: 'Superficie continua, senza fughe',                            linguaggi: ['Minimale', 'Materico'] },
-  { code: 'SIK-P17', name: 'Pittura opaca super-coprente',      dove: 'Tutta la casa',                      note: 'Bianchi e grigi senza riflessi',                              linguaggi: ['Minimale'] },
-  { code: 'SIK-P18', name: 'Resina',                            dove: 'Pavimenti',                          note: 'Una sola superficie da una stanza all\'altra',                linguaggi: ['Minimale'] },
-  { code: 'SIK-P19', name: 'Intonachino minerale',              dove: 'Pareti del living',                  note: 'Grana visibile, effetto pietra naturale',                     linguaggi: ['Materico'] },
-  { code: 'SIK-P20', name: 'Effetto travertino',                dove: 'Parete d\'accento o bagno',          note: 'La materia della pietra con lo spessore di una pittura',     linguaggi: ['Materico'] },
-  { code: 'SIK-P21', name: 'Microcemento spatolato',            dove: 'Pavimenti e piani',                  note: 'Le passate della spatola restano visibili',                   linguaggi: ['Materico', 'Minimale'] },
+  { code: '', name: 'Alphacryl SF',      dove: 'Pareti di tutti gli ambienti',      note: 'Idropittura lavabile e coprente, senza solventi e a basse emissioni',      linguaggi: ['Neutro', 'Minimale'] },
+  { code: '', name: 'Alpha Tex Acryl',   dove: 'Pareti di tutti gli ambienti',      note: 'Idropittura traspirante, con certificazioni ambientali CAM ed EPD',         linguaggi: ['Naturale'] },
+  { code: '', name: 'Alpha Rezisto Mat', dove: 'Pareti principali, anche nei passaggi', note: 'Idropittura opaca lavabile, resiste a macchie, olio e grasso',          linguaggi: ['Caldo', 'Sofisticato', 'Audace'] },
+  { code: '', name: 'Alpha Tacto',       dove: 'Parete d\'accento',                 note: 'Finitura opaca e morbida al tatto, effetto suede o tessuto',               linguaggi: ['Neutro', 'Caldo'] },
+  { code: '', name: 'Alpha Namib',       dove: 'Parete d\'accento',                 note: 'Finitura opaca effetto sabbiato, con un chiaroscuro naturale',             linguaggi: ['Naturale'] },
+  { code: '', name: 'Alpha Elegance',    dove: 'Parete d\'accento',                 note: 'Effetto nuvolato, anche madreperla, per interni di prestigio',             linguaggi: ['Sofisticato'] },
+  { code: '', name: 'Alpha Metallic',    dove: 'Nicchie, dettagli o una parete',    note: 'Idropittura decorativa dall\'aspetto metallizzato, finitura satinata',      linguaggi: ['Sofisticato', 'Audace'] },
+  { code: '', name: 'Alpha Urban Deco',  dove: 'Parete d\'accento',                 note: 'Finitura materica ispirata al cemento, per un look industrial chic',        linguaggi: ['Minimale'] },
+  { code: '', name: 'Chalix Decor',      dove: 'Pareti principali o d\'accento',    note: 'A base di grassello di calce: marmorino, stucco lucido o calce patinata',  linguaggi: ['Materico', 'Naturale'] },
+  { code: '', name: 'Alpha Stone',       dove: 'Parete d\'accento',                 note: 'Finitura materica effetto pietra',                                         linguaggi: ['Materico'] },
+  { code: '', name: 'Alpha Unique',      dove: 'Pareti o dettagli',                 note: 'Finitura decorativa materica opaca, in una sola mano',                     linguaggi: ['Materico'] },
+  { code: '', name: 'Alpha Orient',      dove: 'Camere e zone relax',               note: 'Finitura decorativa con l\'aspetto e il tatto della seta',                  linguaggi: ['Neutro'] },
+  { code: '', name: 'Rubbol BL Satin',   dove: 'Porte, infissi e termosifoni',      note: 'Smalto all\'acqua satinato per legno, ferro e plastica',                   linguaggi: ['Caldo', 'Audace', 'Minimale'] },
 ];
 
 export default {

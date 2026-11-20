@@ -2,28 +2,21 @@
 // GET  /api/repaint?id=…  → { status: 'running' } | { image: url } | { error }
 //
 // "Prova i colori sulla tua stanza": the photo of the visitor's own room goes to
-// Comfy Cloud, where GPT Image 2 repaints its walls with the chosen palette. The
-// same workflow LeadWin and ManyTask use (OpenAIGPTImage1, model gpt-image-2).
+// Comfy Cloud, where GPT Image 2.6 "sunburst", the detail-first one, repaints its
+// walls with the chosen palette (node OpenAIGPTImageNodeV3, the photo as reference).
 // A picture takes about 40 seconds, so the page asks every few seconds instead
 // of holding one request open past Vercel's time limit. COMFY_API_KEY stays here.
 //
-// shortcut: no cap per visitor on the paid generations; add one (per IP, in a KV) before the link goes public.
+// Capped like every paid call (see limit in _ai.js): the phone allows 3 tries a page,
+// the server 12 an hour per visitor and 200 a day for everybody.
 
 import { randomUUID } from 'node:crypto';
-import { checkPalette, send, HttpError, MOCK, mockImage } from './_gemini.js';
+import { comfy, submit, outputs, imageLink, seed, limit, checkPalette, send, HttpError, MOCK, mockImage } from './_ai.js';
 
-const COMFY = 'https://cloud.comfy.org';
 const PHOTO = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/;
 const ID = /^(mock-\d{13}|[0-9a-f-]{36})$/i;
 
-function key() {
-  const k = process.env.COMFY_API_KEY;
-  if (!k) throw new HttpError(503, 'Manca COMFY_API_KEY: la prova sulla tua stanza non è attiva');
-  return k;
-}
-const comfy = (path, init = {}) => fetch(COMFY + path, { ...init, headers: { 'X-API-Key': key(), ...init.headers } });
-
-// The output keeps the photo's shape: short side 1088, long side up to 1936, multiples of 16 (gpt-image-2)
+// The output keeps the photo's shape: short side 1088, long side up to 1936, multiples of 16 (GPT Image)
 function size(ratio) {
   const r = Math.min(16 / 9, Math.max(9 / 16, Number(ratio) || 1));
   const long = Math.min(1936, Math.round(1088 * Math.max(r, 1 / r) / 16) * 16);
@@ -41,11 +34,12 @@ function prompt(pal) {
   ].join('\n');
 }
 
-async function start(body) {
+async function start(body, req) {
   const m = PHOTO.exec(String(body?.image || ''));
   if (!m || m[2].length > 8e6) throw new HttpError(400, 'Foto non valida');
   const pal = checkPalette(body.palette);
   if (MOCK) return { id: `mock-${Date.now()}` };
+  await limit(req, 'repaint', 12, 200);
 
   // a name of its own: two visitors at once must not overwrite each other's photo
   const form = new FormData();
@@ -59,41 +53,27 @@ async function start(body) {
   const [w, h] = size(body.ratio);
   const workflow = {
     3: { class_type: 'LoadImage', inputs: { image: uj.name } },
-    1: { class_type: 'OpenAIGPTImage1', inputs: {
-      prompt: prompt(pal), quality: 'medium', background: 'opaque', n: 1, model: 'gpt-image-2',
-      size: 'Custom', custom_width: w, custom_height: h,
-      seed: Math.floor(Math.random() * 2147483647),   // a new seed every time, or Comfy answers from its cache
-      image: ['3', 0],
+    1: { class_type: 'OpenAIGPTImageNodeV3', inputs: {   // a model with inputs of its own: they go as "model.<name>"
+      model: 'gpt-image-2.6-sunburst',
+      'model.prompt': prompt(pal), 'model.size': 'Custom', 'model.custom_width': w, 'model.custom_height': h,
+      'model.background': 'opaque', 'model.quality': 'medium', 'model.complexity': 'medium', 'model.seed': seed(),
+      'model.images.image_1': ['3', 0],
     } },
     2: { class_type: 'SaveImage', inputs: { images: ['1', 0], filename_prefix: 'finishdecor' } },
   };
-  const r = await comfy('/api/prompt', { method: 'POST', headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ prompt: workflow, extra_data: { api_key_comfy_org: key() } }) });
-  const j = await r.json().catch(() => null);
-  if (r.status === 402) throw new HttpError(503, 'Crediti Comfy finiti');
-  if (!r.ok || !j?.prompt_id) throw new HttpError(502, 'Comfy non è partito');
-  return { id: String(j.prompt_id) };
+  return { id: await submit(workflow) };
 }
 
 async function check(id) {
   if (!ID.test(id)) throw new HttpError(400, 'id non valido');
   if (id.startsWith('mock-')) return Date.now() - Number(id.slice(5)) < 4000 ? { status: 'running' } : { image: await mockImage() };
-  const st = await comfy(`/api/job/${id}/status`).then(x => x.json()).catch(() => null);
-  if (['error', 'non_retryable_error', 'lost', 'cancelled'].includes(st?.status)) throw new HttpError(502, 'La generazione non è riuscita');
-  if (st?.status !== 'success') return { status: 'running' };
-  const job = await comfy(`/api/jobs/${id}`).then(x => x.json()).catch(() => null);
-  const out = job?.outputs?.['2']?.images?.[0];
-  if (!out?.filename) throw new HttpError(502, 'Comfy ha finito ma il risultato non c\'è');
-  // /api/view answers 302 to a signed link: the page loads the picture from there, without the key
-  const view = await comfy(`/api/view?${new URLSearchParams({ filename: out.filename, subfolder: out.subfolder || '', type: 'output' })}`, { redirect: 'manual' });
-  const signed = view.headers.get('location');
-  if (!signed) throw new HttpError(502, 'Download del risultato non riuscito');
-  return { image: signed };
+  const out = await outputs(id);
+  return out ? { image: await imageLink(out['2']) } : { status: 'running' };
 }
 
 export default async function handler(req, res) {
   try {
-    if (req.method === 'POST') return send(res, 200, await start(req.body));
+    if (req.method === 'POST') return send(res, 200, await start(req.body, req));
     if (req.method === 'GET') return send(res, 200, await check(new URL(req.url, 'http://x').searchParams.get('id') || ''));
     send(res, 405, { error: 'Usa GET o POST' });
   } catch (e) {

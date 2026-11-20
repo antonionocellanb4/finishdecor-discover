@@ -3,8 +3,8 @@
 //
 //   node dev-server.mjs            → http://localhost:8137
 //
-// Reads GEMINI_API_KEY (and the optional AI_MOCK, GEMINI_*_MODEL) from the
-// environment or from a .env file next to this one. No dependencies.
+// Reads COMFY_API_KEY (and the optional AI_MOCK) from the environment or from
+// a .env file next to this one. No dependencies.
 
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
@@ -46,6 +46,6 @@ http.createServer(async (req, res) => {
     res.writeHead(200, { 'content-type': TYPES[extname(rel)] || 'application/octet-stream', 'cache-control': 'no-cache' }).end(body);
   } catch { res.writeHead(404).end('Non trovato'); }
 }).listen(PORT, () => {
-  const mode = process.env.AI_MOCK === '1' ? 'AI di prova (AI_MOCK=1)' : process.env.GEMINI_API_KEY ? 'AI attiva (Gemini)' : 'senza AI (manca GEMINI_API_KEY)';
+  const mode = process.env.AI_MOCK === '1' ? 'AI di prova (AI_MOCK=1)' : process.env.COMFY_API_KEY ? 'AI attiva (Comfy Cloud)' : 'senza AI (manca COMFY_API_KEY)';
   console.log(`FinishDecor Discover → http://localhost:${PORT}  ·  ${mode}`);
 });
