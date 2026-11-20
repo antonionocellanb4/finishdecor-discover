@@ -47,12 +47,14 @@ con le foto del percorso al posto delle immagini dell'AI (quelle restano sullo
 schermo dello showroom: per portarle a casa servirebbe salvarle su un server).
 Nessun dato del cliente salvato da nessuna parte.
 
-**Prova i colori sulla tua stanza.** Nel progetto aperto sul telefono c'è una
-sezione in più: si sceglie la palette, si scatta o si sceglie una foto di una
+**Prova i colori sulla tua stanza.** Nel progetto aperto sul telefono il bottone
+in basso non è più "Porta a casa il progetto" (il progetto è già lì) ma "Prova
+sulla tua stanza": si sceglie la palette, si scatta o si sceglie una foto di una
 stanza e l'AI ne ridipinge le pareti (pareti principali nel primo colore, una
-parete d'accento nel terzo; il resto della foto resta com'è). Prima e dopo uno
-sopra l'altro, poi "Salva l'immagine". Sul monitor dello showroom la sezione non
-c'è: le foto della persona stanno sul suo telefono.
+parete d'accento nel terzo; il resto della foto resta com'è). Fino a 3 prove:
+ognuna è un prima/dopo con il cursore da trascinare e l'icona per scaricarla, e
+le miniature passano da una prova all'altra. Sul monitor dello showroom la
+sezione non c'è: le foto della persona stanno sul suo telefono.
 
 Per questo il QR funziona solo se l'app è pubblicata su un indirizzo vero
 (Vercel, GitHub Pages…). Da `localhost` o da file il link punta al computer

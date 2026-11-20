@@ -620,16 +620,33 @@ img{display:block}
 .prod-where{font-size:0.875rem;color:var(--label-2);margin-top:0.125rem}
 .prod-note{font-size:0.875rem;color:var(--label-3);margin-top:0.125rem}
 .r-foot{font-size:0.875rem;color:var(--label-3);margin-top:1.5rem}
-/* on the phone: the visitor's own room, its walls repainted by the AI with a palette */
+/* on the phone: the visitor's own room, its walls repainted by the AI with a palette.
+   Up to three tries, each one a before/after picture with a handle to drag. */
 .try-pals{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem}
 .try-pal{display:inline-flex;align-items:center;gap:0.5rem;min-height:2.75rem;padding:0 1rem 0 0.5rem;border-radius:999px;background:var(--fill);font-size:0.9375rem;font-weight:500}
 .try-pal[aria-pressed="true"]{background:var(--tint);color:var(--on-tint)}
 .try-strip{display:flex;width:2.75rem;height:1.5rem;border-radius:999px;overflow:hidden}
 .try-strip b{flex:1}
-.try-pick{margin-top:1rem;cursor:pointer}
-.try-out{display:flex;flex-direction:column;gap:0.375rem;margin-top:1rem}
-.try-save{display:inline-flex;align-items:center;justify-content:center;width:100%;margin-top:0.375rem}
 .try-msg{font-size:0.9375rem;color:var(--label-2);margin-top:0.75rem}
+.try-view{margin-top:1rem}
+.cmp{position:relative;overflow:hidden;border-radius:var(--r-card);background:var(--surface);touch-action:pan-y pinch-zoom;-webkit-user-select:none;user-select:none;--x:50%}
+.cmp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;-webkit-user-drag:none}
+.cmp-before{clip-path:inset(0 calc(100% - var(--x)) 0 0)}
+.cmp .gen-tag.r{left:auto;right:0.625rem}
+.cmp-handle{position:absolute;z-index:2;top:0;bottom:0;left:var(--x);width:2px;margin-left:-1px;background:#fff;cursor:ew-resize;outline:none}
+.cmp-handle svg{position:absolute;top:50%;left:50%;width:2.75rem;height:2.75rem;margin:-1.375rem 0 0 -1.375rem;padding:0.6875rem;border-radius:50%;background:#fff;color:#121212}
+.cmp-handle:focus-visible svg{outline:2px solid var(--tint);outline-offset:2px}
+.cmp-dl{position:absolute;z-index:2;top:0.625rem;right:0.625rem;display:grid;place-items:center;width:2.75rem;height:2.75rem;border-radius:50%;background:rgba(18,18,18,0.8);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff}
+.cmp-dl svg{width:1.25rem;height:1.25rem}
+/* still being repainted: the photo as it is, with a light sweeping over it */
+.cmp.busy .cmp-before{clip-path:none}
+.cmp.busy .cmp-handle,.cmp.busy .cmp-dl,.cmp.busy .gen-tag.r{display:none}
+.cmp.busy::after,.try-tab.busy::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,0.16) 50%,transparent 65%) 0 0/300% 100%;animation:shimmer 1.6s linear infinite}
+.try-cap{display:flex;justify-content:space-between;gap:1rem;margin-top:0.625rem;font-size:0.875rem;color:var(--label-2)}
+.try-tabs{display:flex;gap:0.625rem;margin-top:0.875rem}
+.try-tab{position:relative;flex:0 0 5.5rem;aspect-ratio:4/3;overflow:hidden;border-radius:var(--r-control);background:var(--surface)}
+.try-tab img{width:100%;height:100%;object-fit:cover}
+.try-tab[aria-pressed="true"]{outline:2px solid var(--tint);outline-offset:2px}
 .result-actions{
   flex:0 0 auto;display:flex;gap:0.5rem;
   margin:0 -1rem;padding:0.75rem 1rem max(0.625rem, var(--safe-b));
@@ -702,7 +719,7 @@ img{display:block}
   .mosaic-col,.ai-swatches i{animation:none}
   .g-move,.g-dot,.g-trail,.card.nudge,.deck-actions.demo .act{animation:none}
   .g-move,.g-dot{opacity:1}
-  .screen,.ai-lines li,.pal,.gen.busy,.fan i{animation:none}
+  .screen,.ai-lines li,.pal,.gen.busy,.fan i,.cmp.busy::after,.try-tab.busy::after{animation:none}
 }
 </style>
 </head>
@@ -837,20 +854,36 @@ img{display:block}
 
       <section class="r-pal" id="r-try" hidden>
         <h3 class="r-pal-name">Prova i colori sulla tua stanza</h3>
-        <p class="r-desc">Scatta o scegli una foto di una stanza: l'AI ne ridipinge le pareti con la palette che scegli.</p>
+        <p class="r-desc">Scatta o scegli una foto di una stanza: l'AI ne ridipinge le pareti con la palette che scegli. Puoi fare fino a 3 prove.</p>
         <div class="try-pals" id="try-pals"></div>
-        <label class="btn-primary try-pick"><span id="try-pick-label">Scegli una foto</span><input type="file" accept="image/*" id="try-file" hidden></label>
+        <input type="file" accept="image/*" id="try-file" hidden>
         <p class="try-msg" id="try-msg" role="status" hidden></p>
-        <div class="try-out" id="try-out" hidden></div>
+        <div class="try-view" id="try-view" hidden>
+          <div class="cmp" id="try-cmp">
+            <img class="cmp-after" id="try-after" alt="">
+            <img class="cmp-before" id="try-before" alt="La tua foto">
+            <span class="gen-tag" id="try-tag">Prima</span>
+            <span class="gen-tag r">Dopo</span>
+            <div class="cmp-handle" id="try-handle" role="slider" tabindex="0" aria-label="Confronta prima e dopo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5"/></svg>
+            </div>
+            <a class="cmp-dl" id="try-dl" target="_blank" rel="noopener" download aria-label="Scarica l'immagine">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+            </a>
+          </div>
+          <div class="try-cap"><span id="try-cap-pal"></span><span id="try-cap-n"></span></div>
+          <div class="try-tabs" id="try-tabs"></div>
+        </div>
       </section>
 
       <p class="r-foot">Proposta costruita sulle tue scelte. Portala in showroom: i nostri specialisti la trasformano in campioni reali.</p>
     </div>
-    <div class="result-actions">
+    <div class="result-actions" id="result-actions">
       <button class="btn-primary" id="share-open" type="button">
         <span>Porta a casa il progetto</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
       </button>
+      <button class="btn-primary" id="try-go" type="button" hidden>Prova sulla tua stanza</button>
     </div>
   </section>
 
@@ -2066,35 +2099,97 @@ function putImg(g, src, alt) {
 // ── TRY IT ON YOUR ROOM (phone only) ──
 // From the project opened on the phone, a photo of the visitor's own room goes
 // to the AI (api/repaint.js), which repaints its walls with the palette they
-// pick. The showroom screen has no photos of the visitor: there it stays hidden.
-let tryPal = 0, tryRun = 0;
+// pick: up to three tries, each one a before/after picture to download. On the
+// phone the bottom button starts a try, since the project is already in hand
+// there; the showroom screen has no photos of the visitor and keeps its QR.
+const MAX_TRIES = 3;
+const tries = [];   // { pal, before, ratio, after }: after stays null while the AI paints
+let tryPal = 0, tryShown = 0, cmpX = 50;
+const tryMsg = t => { $('try-msg').textContent = t; $('try-msg').hidden = !t; };
 function renderTry() {
   $('r-try').hidden = !S.shared;
-  if (!S.shared) return;
-  tryPal = S.picks[0];
-  const box = $('try-pals');
-  box.textContent = '';
-  box.hidden = S.picks.length < 2;
-  S.picks.forEach(pi => {
+  $('share-open').hidden = S.shared;
+  if (S.shared) {
+    tryPal = S.picks[0];
+    const box = $('try-pals');
+    box.textContent = '';
+    S.picks.forEach(pi => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'try-pal';
+      b.setAttribute('aria-pressed', String(pi === tryPal));
+      const strip = document.createElement('span'); strip.className = 'try-strip';
+      S.pals[pi].colors.forEach(c => { const s = document.createElement('b'); s.style.background = c.hex; strip.appendChild(s); });
+      b.append(strip, S.pals[pi].name);
+      b.addEventListener('click', () => { tryPal = pi; [...box.children].forEach(x => x.setAttribute('aria-pressed', String(x === b))); });
+      box.appendChild(b);
+    });
+  }
+  tryState();
+}
+// What follows the tries: the bottom button, the big picture, the thumbnails
+function tryState() {
+  const busy = tries.some(t => !t.after), done = tries.length >= MAX_TRIES && !busy;
+  const go = $('try-go');
+  go.hidden = !S.shared || done;
+  go.disabled = busy;
+  go.textContent = busy ? 'Sto ridipingendo la stanza…' : tries.length ? 'Prova con un\'altra foto' : 'Prova sulla tua stanza';
+  $('result-actions').hidden = S.shared && done;
+  $('try-pals').hidden = S.picks.length < 2 || done;
+  if (done) tryMsg('Hai fatto le 3 prove.');
+  $('try-view').hidden = !tries.length;
+  if (!tries.length) return;
+  const t = tries[tryShown], cmp = $('try-cmp'), key = tryShown + (t.after ? 'd' : 'b');
+  cmp.classList.toggle('busy', !t.after);
+  cmp.style.aspectRatio = t.ratio;
+  $('try-before').src = t.before;
+  $('try-after').hidden = !t.after;
+  if (t.after) { $('try-after').src = t.after; $('try-after').alt = `La tua stanza con la palette ${t.pal.name}`; $('try-dl').href = t.after; }
+  $('try-tag').textContent = t.after ? 'Prima' : 'In arrivo';
+  $('try-cap-pal').textContent = `Palette ${t.pal.name}`;
+  $('try-cap-n').textContent = `Prova ${tryShown + 1} di ${MAX_TRIES}`;
+  if (cmp.dataset.k !== key) { cmp.dataset.k = key; setCmp(50); }   // a new picture starts from the middle
+  const tabs = $('try-tabs');
+  tabs.textContent = '';
+  tabs.hidden = tries.length < 2;
+  tries.forEach((x, i) => {
     const b = document.createElement('button');
-    b.type = 'button'; b.className = 'try-pal';
-    b.setAttribute('aria-pressed', String(pi === tryPal));
-    const strip = document.createElement('span'); strip.className = 'try-strip';
-    S.pals[pi].colors.forEach(c => { const s = document.createElement('b'); s.style.background = c.hex; strip.appendChild(s); });
-    b.append(strip, S.pals[pi].name);
-    b.addEventListener('click', () => { tryPal = pi; [...box.children].forEach(x => x.setAttribute('aria-pressed', String(x === b))); });
-    box.appendChild(b);
+    b.type = 'button'; b.className = 'try-tab' + (x.after ? '' : ' busy');
+    b.setAttribute('aria-pressed', String(i === tryShown));
+    b.setAttribute('aria-label', `Prova ${i + 1}, palette ${x.pal.name}`);
+    const im = document.createElement('img'); im.alt = ''; im.src = x.after || x.before;
+    b.appendChild(im);
+    b.addEventListener('click', () => { tryShown = i; tryState(); });
+    tabs.appendChild(b);
   });
 }
-// The photo shrunk to 1536 px on its long side: light to send, plenty for the model
+// The handle: dragged anywhere on the picture (a vertical swipe still scrolls the page), or the arrow keys
+function setCmp(x) {
+  cmpX = clamp(x, 0, 100);
+  $('try-cmp').style.setProperty('--x', cmpX + '%');
+  $('try-handle').setAttribute('aria-valuenow', String(Math.round(cmpX)));
+}
+$('try-cmp').addEventListener('pointerdown', e => { if (!e.target.closest('.cmp-dl')) e.currentTarget.setPointerCapture(e.pointerId); });
+$('try-cmp').addEventListener('pointermove', e => {
+  const c = e.currentTarget;
+  if (!c.hasPointerCapture(e.pointerId) || c.classList.contains('busy')) return;
+  const r = c.getBoundingClientRect();
+  setCmp((e.clientX - r.left) / r.width * 100);
+});
+$('try-handle').addEventListener('keydown', e => {
+  const d = { ArrowLeft:-5, ArrowRight:5 }[e.key];
+  if (d) { e.preventDefault(); setCmp(cmpX + d); }
+});
+// The photo shrunk to 1536 px on its long side, light to send and plenty for the model.
+// One wider or taller than the model draws (16:9) is cropped to it, so before and after line up.
 function shrink(file) {
   return new Promise((ok, ko) => {
     const img = new Image(), url = URL.createObjectURL(file);
     img.onload = () => {
-      const k = Math.min(1, 1536 / Math.max(img.naturalWidth, img.naturalHeight));
+      const w = img.naturalWidth, h = img.naturalHeight, r = clamp(w / h, 9 / 16, 16 / 9);
+      const sw = Math.min(w, h * r), sh = sw / r, k = Math.min(1, 1536 / Math.max(sw, sh));
       const c = document.createElement('canvas');
-      c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
-      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      c.width = Math.round(sw * k); c.height = Math.round(sh * k);
+      c.getContext('2d').drawImage(img, (w - sw) / 2, (h - sh) / 2, sw, sh, 0, 0, c.width, c.height);
       URL.revokeObjectURL(url);
       ok({ data:c.toDataURL('image/jpeg', 0.85), ratio:c.width / c.height });
     };
@@ -2102,48 +2197,35 @@ function shrink(file) {
     img.src = url;
   });
 }
+$('try-go').addEventListener('click', () => $('try-file').click());
 $('try-file').addEventListener('change', async e => {
   const file = e.target.files[0];
   e.target.value = '';   // the same photo can be picked again
-  if (!file) return;
-  const run = ++tryRun, pal = S.pals[tryPal];
-  const msg = t => { $('try-msg').textContent = t; $('try-msg').hidden = !t; };
-  msg('');
+  if (!file || tries.length >= MAX_TRIES || tries.some(t => !t.after)) return;
+  tryMsg('');
   let photo;
-  try { photo = await shrink(file); } catch { msg('Non riesco a leggere questa foto: prova con un\'altra.'); return; }
-  const out = $('try-out');
-  out.textContent = ''; out.hidden = false;
-  const frame = (label, busy) => {
-    const g = document.createElement('div');
-    g.className = 'gen' + (busy ? ' busy' : ''); g.style.aspectRatio = photo.ratio;
-    const t = document.createElement('span'); t.className = 'gen-tag'; t.textContent = label;
-    g.appendChild(t); out.appendChild(g);
-    return g;
-  };
-  const after = frame(`Con la palette ${pal.name}`, true);
-  putImg(frame('La tua foto'), photo.data, 'La tua foto');
-  $('try-pick-label').textContent = 'Prova con un\'altra foto';
+  try { photo = await shrink(file); } catch { tryMsg('Non riesco a leggere questa foto: prova con un\'altra.'); return; }
+  const t = { pal:S.pals[tryPal], before:photo.data, ratio:photo.ratio, after:null };
+  tries.push(t); tryShown = tries.length - 1; tryState();
+  $('r-try').scrollIntoView({ behavior:'smooth', block:'start' });
   try {
-    const { id } = await api('repaint', { image:photo.data, ratio:photo.ratio, palette:pal.colors.map(c => ({ name:c.name, hex:c.hex })) });
-    for (let t = 0; t < 60; t++) {   // a check every 3 s, three minutes at most
+    const { id } = await api('repaint', { image:photo.data, ratio:photo.ratio, palette:t.pal.colors.map(c => ({ name:c.name, hex:c.hex })) });
+    for (let n = 0; n < 60; n++) {   // a check every 3 s, three minutes at most
       await new Promise(r => setTimeout(r, 3000));
-      if (run !== tryRun) return;
-      const r = await fetch('api/repaint?id=' + encodeURIComponent(id)).then(x => x.json());
+      const r = await fetch('api/repaint?id=' + encodeURIComponent(id)).then(x => x.json()).catch(() => ({}));   // a dropped check on a phone network: ask again
       if (r.error) throw new Error(r.error);
       if (!r.image) continue;
-      after.classList.remove('busy');
-      putImg(after, r.image, `La tua stanza con la palette ${pal.name}`);
-      const save = document.createElement('a');
-      save.className = 'btn-quiet try-save'; save.href = r.image; save.download = 'finishdecor-stanza.png';
-      save.target = '_blank'; save.rel = 'noopener'; save.textContent = 'Salva l\'immagine';
-      out.appendChild(save);
+      await new Promise(ok => { const i = new Image(); i.onload = i.onerror = ok; i.src = r.image; });   // shown once it has arrived
+      t.after = r.image;
+      tryState();
       return;
     }
     throw new Error('tempo scaduto');
   } catch (err) {
-    if (run !== tryRun) return;
-    out.textContent = ''; out.hidden = true;
-    msg(/COMFY_API_KEY/.test(err.message) ? 'La prova sulla tua stanza non è ancora attiva.' : 'Non è riuscita: riprova tra poco.');
+    tries.splice(tries.indexOf(t), 1);
+    tryShown = Math.max(0, tries.length - 1);
+    tryState();
+    tryMsg(/COMFY_API_KEY/.test(err.message) ? 'La prova sulla tua stanza non è ancora attiva.' : 'Non è riuscita: riprova tra poco.');
   }
 });
 
