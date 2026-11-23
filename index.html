@@ -540,10 +540,10 @@ img{display:block}
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
   font-size:0.875rem;line-height:1.35;color:var(--label-2);margin-top:0.125rem;
 }
-/* rounded diamonds overlapping, ringed in the card colour, as big as the card allows */
-.pal-sws{flex:1 1 auto;min-height:5.5rem;container-type:size;display:flex;justify-content:center;align-items:center}
-.pal-sws i{flex:0 0 auto;width:min(17cqw,62cqh);aspect-ratio:1;border-radius:28%;transform:rotate(45deg);box-shadow:0 0 0 0.2rem rgba(255,255,255,0.16)}
-.pal-sws i+i{margin-left:calc(min(17cqw,62cqh) * -0.08)}
+/* rounded diamonds, ringed in the card colour, as big as the card allows, spread over the whole
+   width: the same five columns as the dots below, so each diamond stands over its own colour */
+.pal-sws{flex:1 1 auto;min-height:5.5rem;container-type:size;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0.25rem;padding:0 0.5rem;place-items:center}
+.pal-sws i{width:min(17cqw,62cqh);aspect-ratio:1;border-radius:28%;transform:rotate(45deg);box-shadow:0 0 0 0.2rem rgba(255,255,255,0.16)}
 /* under them, one dot per colour with name and code: what to ask for at the counter */
 .pal-dots{display:grid;grid-template-columns:repeat(5,1fr);gap:0.25rem;padding:0.5rem 0.5rem 0.4375rem;border-radius:1.25rem;background:rgba(255,255,255,0.06)}
 .pal-dot{display:flex;flex-direction:column;align-items:center;min-width:0;text-align:center}
@@ -1872,6 +1872,7 @@ function palsMode(m) {
   $('pals-wait').hidden = ready;
   $('pals').hidden = !ready || wait;
   $('pals').classList.toggle('look', look);
+  $('pals').scrollTop = 0;   // each phase opens on the first palette, wherever the visitor had scrolled before
   $('pals-qr').hidden = !(look && ready) || VIEW;
   $('fan').hidden = !wait;
   $('wait-go').hidden = true;
