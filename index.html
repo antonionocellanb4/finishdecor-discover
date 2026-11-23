@@ -369,6 +369,36 @@ img{display:block}
 @keyframes demo-yes{0%,20%,34%,100%{background:rgba(38,38,38,0.62);color:#fff;border-color:rgba(255,255,255,0.22)}24%,30%{background:#F5A623;color:#1a1000;border-color:#F5A623}}
 @keyframes demo-no{0%,55%,69%,100%{background:rgba(38,38,38,0.62);color:#fff;border-color:rgba(255,255,255,0.14)}59%,65%{background:#F5A623;color:#1a1000;border-color:#F5A623}}
 @keyframes demo-mid{0%,86%,100%{background:rgba(38,38,38,0.62);color:#fff;border-color:rgba(255,255,255,0.14)}90%,96%{background:#F5A623;color:#1a1000;border-color:#F5A623}}
+/* Before the first photo: what the answers are for and how to give them. The
+   first three photos of the deck fan out in the middle; the three answers below
+   use the deck buttons' icons. It covers the deck until "Inizia a scegliere". */
+.howto{
+  position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;
+  padding:calc(var(--safe-t) + 4.75rem) 1rem max(1rem, var(--safe-b));
+  background:var(--bg);transition:opacity .35s;
+}
+.howto.gone{opacity:0;pointer-events:none}
+.howto-fan{flex:1 1 auto;min-height:0;position:relative;margin:1rem 0 1.25rem;container-type:size}
+.howto-fan img{
+  position:absolute;left:50%;top:50%;width:min(62cqw,75cqh);aspect-ratio:3/4;   /* as big as the space allows, never taller */
+  object-fit:cover;border-radius:2rem;background:var(--surface);box-shadow:0 1rem 2.5rem rgba(0,0,0,0.5);
+  transform-origin:50% 100%;transform:translate(var(--x),-50%) rotate(var(--r));
+  animation:howto-fan .8s cubic-bezier(0.32,0.72,0,1) .2s both;
+}
+.howto-fan img:nth-child(1){--x:-60%;--r:-8deg}
+.howto-fan img:nth-child(2){--x:-40%;--r:8deg}
+.howto-fan img:nth-child(3){--x:-50%;--r:0deg}   /* the first photo, on top */
+@keyframes howto-fan{from{transform:translate(-50%,-50%) rotate(0)}}
+.howto-list{flex:0 0 auto;list-style:none;margin:0;padding:0}
+.howto-list li{display:flex;align-items:center;gap:0.875rem;padding:0.75rem 0;font-size:0.9375rem;line-height:1.35;color:var(--label-2)}
+.howto-list li+li{border-top:1px solid var(--separator)}
+.howto-list b{display:block;font-size:1.125rem;font-weight:500;color:var(--label)}
+.howto-ic{
+  flex:0 0 auto;width:3rem;height:3rem;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--surface);border:1px solid rgba(255,255,255,0.14);color:#fff;
+}
+.howto-ic svg{width:1.25rem;height:1.25rem}
 
 /* ── STEP 2: A OR B ── */
 .ab{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:0.75rem}
@@ -416,28 +446,25 @@ img{display:block}
 }
 .ap[aria-pressed="true"] svg,.pal.on svg{background:var(--tint);border-color:var(--tint);color:var(--on-tint)}
 .ap+.ap{border-top:1px solid var(--separator)}
-/* step 1: tall cards in a carousel, lined up with the title; the current one outlined in amber */
-.tcar{
-  position:relative;flex:1 1 auto;min-height:0;display:flex;gap:0.875rem;
-  overflow-x:hidden;touch-action:pan-y;scrollbar-width:none;   /* the swipe is handled in JS: a short flick is enough */
-  margin:0 -1rem;padding:0.25rem 1rem;
-}
-.tcar::-webkit-scrollbar{display:none}
+/* step 1: the seven spaces in one grid as tall as the screen: Casa across the top, then two per row */
+#s-type{padding-bottom:max(1rem, var(--safe-b))}   /* the same gutter as the sides */
+.tgrid{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,minmax(0,1fr));gap:0.75rem}
 .tcard{
-  flex:0 0 86%;position:relative;overflow:hidden;
-  border-radius:2rem;background:var(--surface);text-align:left;border:1.5px solid transparent;
-  transform:scale(0.92);opacity:0.5;
-  transition:transform .35s cubic-bezier(0.32,0.72,0,1),opacity .35s,border-color .35s;
+  position:relative;overflow:hidden;min-height:0;container-type:size;
+  border-radius:2rem;background:var(--surface);text-align:left;
+  transition:transform .2s,opacity .35s;
 }
-.tcard.on{transform:none;opacity:1;border-color:var(--tint)}
+.tcard:first-child{grid-column:1 / -1}
+.tcard:active{transform:scale(0.985)}
+/* the chosen one: a thick amber ring drawn over the photo */
+.tcard::after{content:'';position:absolute;inset:0;border-radius:inherit;border:0.1875rem solid transparent;transition:border-color .2s}
+.tcard[aria-pressed="true"]::after{border-color:var(--tint)}
 .tcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.tcard-cap{position:absolute;left:0;right:0;bottom:0;padding:3rem 1.25rem 1.25rem;background:linear-gradient(to top,rgba(0,0,0,0.8) 10%,transparent)}
+.tcard-cap{position:absolute;left:0;right:0;bottom:0;padding:3rem 1.25rem 1.125rem;background:linear-gradient(to top,rgba(0,0,0,0.85),rgba(0,0,0,0.5) 55%,transparent)}
 .tcard-name{display:block;font-size:1.75rem;font-weight:300;letter-spacing:-0.02em;line-height:1.15}
-.tcard-sub{display:block;font-size:0.9375rem;color:var(--label-2);margin-top:0.125rem}
-.tcar-foot{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:0.875rem;margin-top:0.875rem}
-.tcar-dots{display:flex;gap:0.375rem}
-.tcar-dots i{width:0.4375rem;height:0.4375rem;border-radius:999px;background:var(--fill);transition:background .3s,width .3s}
-.tcar-dots i.on{width:1.25rem;background:var(--tint)}
+.tcard-sub{display:block;font-size:0.9375rem;line-height:1.3;color:var(--label-2);margin-top:0.1875rem}
+@container (max-width:15rem){.tcard-cap{padding:2.5rem 1rem 1rem}.tcard-name{font-size:1.375rem}.tcard-sub{font-size:0.875rem}}   /* phone cells */
+@container (max-height:8.5rem){.tcard-sub{display:none}}   /* short screens: the name alone */
 .tcard.dimmed{opacity:0.3}
 
 /* ── STEP 5: AI READING ── */
@@ -717,7 +744,7 @@ img{display:block}
 
 @media (prefers-reduced-motion:reduce){
   .mosaic-col,.ai-swatches i{animation:none}
-  .g-move,.g-dot,.g-trail,.card.nudge,.deck-actions.demo .act{animation:none}
+  .g-move,.g-dot,.g-trail,.card.nudge,.deck-actions.demo .act,.howto-fan img{animation:none}
   .g-move,.g-dot{opacity:1}
   .screen,.ai-lines li,.pal,.gen.busy,.fan i,.cmp.busy::after,.try-tab.busy::after{animation:none}
 }
@@ -763,8 +790,7 @@ img{display:block}
       <h2 class="screen-title">Che spazio vuoi creare?</h2>
       <p class="screen-sub">Le immagini del percorso cambiano in base alla tua scelta.</p>
     </div>
-    <div class="tcar" id="tcar"></div>
-    <div class="tcar-foot" id="tcar-foot"><div class="tcar-dots" id="tcar-dots" aria-hidden="true"></div><button class="btn-primary" id="tcar-go" type="button"></button></div>
+    <div class="tgrid" id="tgrid"></div>
   </section>
 
   <!-- 2 · ESPLORA -->
@@ -785,6 +811,20 @@ img{display:block}
       <button class="act act-md" id="deck-no" type="button" aria-label="Non fa per me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg><span class="act-label">Non fa per me</span></button>
       <button class="act act-sm" id="deck-mid" type="button" aria-label="Mi incuriosisce"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="act-label">Mi incuriosisce</span></button>
       <button class="act act-lg" id="deck-yes" type="button" aria-label="Mi rappresenta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.2s-7.2-4.4-9.1-8.9C1.5 8 3.6 4.7 7 4.7c2.1 0 3.5 1.1 5 2.9 1.5-1.8 2.9-2.9 5-2.9 3.4 0 5.5 3.3 4.1 6.6-1.9 4.5-9.1 8.9-9.1 8.9z"/></svg><span class="act-label">Mi rappresenta</span></button>
+    </div>
+    <!-- before the first photo: why the visitor answers, and how -->
+    <div class="howto" id="howto" hidden>
+      <div class="screen-head">
+        <h2 class="screen-title">Scegli le tue ispirazioni</h2>
+        <p class="screen-sub" id="howto-sub"></p>
+      </div>
+      <div class="howto-fan" id="howto-fan" aria-hidden="true"></div>
+      <ul class="howto-list">
+        <li><span class="howto-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.2s-7.2-4.4-9.1-8.9C1.5 8 3.6 4.7 7 4.7c2.1 0 3.5 1.1 5 2.9 1.5-1.8 2.9-2.9 5-2.9 3.4 0 5.5 3.3 4.1 6.6-1.9 4.5-9.1 8.9-9.1 8.9z"/></svg></span><span><b>Mi rappresenta</b>Trascina a destra</span></li>
+        <li><span class="howto-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg></span><span><b>Mi incuriosisce</b>Trascina in alto</span></li>
+        <li><span class="howto-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></span><span><b>Non fa per me</b>Trascina a sinistra</span></li>
+      </ul>
+      <div class="actions"><button class="btn-primary" id="howto-go" type="button">Inizia a scegliere</button></div>
     </div>
   </section>
 
@@ -1239,7 +1279,7 @@ let S;
 function fresh() {
   S = { scores:Object.fromEntries(KEYS.map(k => [k, 0])), ab:Object.fromEntries(KEYS.map(k => [k, 0])),
         liked:[], seenCats:{}, likedCats:{}, deckIdx:0, abIdx:0, type:null, brand:'sikkens',
-        approaches:[], pals:[], picks:[], prop:null, insights:[], decisions:0, shared:false, touched:false };
+        approaches:[], pals:[], picks:[], prop:null, insights:[], decisions:0, shared:false, touched:false, briefed:false };
 }
 fresh();
 // Steps that wait for an animation before moving on die with the session: a
@@ -1317,12 +1357,10 @@ function setType(t) {
   PAIRS = TYPES[t].pairs;
 }
 let typeBusy = false;
-let carIdx = 0;
 function renderTypes() {
-  const track = $('tcar');
-  track.textContent = '';
-  $('tcar-dots').textContent = '';
-  Object.entries(TYPES).forEach(([k, T], n) => {
+  const grid = $('tgrid');
+  grid.textContent = '';
+  Object.entries(TYPES).forEach(([k, T]) => {
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'tcard';
     b.setAttribute('aria-label', `${T.label}: ${T.sub}`);
@@ -1333,60 +1371,10 @@ function renderTypes() {
     const sb = document.createElement('span'); sb.className = 'tcard-sub'; sb.textContent = T.sub;
     cap.append(nm, sb);
     b.append(img, cap);
-    // the current card is chosen with a tap; any other one comes forward first
-    b.addEventListener('click', () => { if (n === carIdx) chooseType(k, b); else carTo(n); });
-    track.appendChild(b);
-    $('tcar-dots').appendChild(document.createElement('i'));
+    b.addEventListener('click', () => chooseType(k, b));
+    grid.appendChild(b);
   });
-  track.scrollLeft = 0; carIdx = 0;
-  requestAnimationFrame(syncCar);
 }
-// the current card sits on the left edge, under the title
-function carTo(n) {
-  const track = $('tcar');
-  track.scrollTo({ left:track.children[n].offsetLeft - parseFloat(getComputedStyle(track).paddingLeft), behavior:'smooth' });
-}
-// the card nearest the left edge is the current one (the last, once the end is reached):
-// outline, dot and button follow it
-function syncCar() {
-  const track = $('tcar'), cards = [...track.children], pad = parseFloat(getComputedStyle(track).paddingLeft);
-  if (track.scrollLeft >= track.scrollWidth - track.clientWidth - 2) carIdx = cards.length - 1;
-  else {
-    let bd = Infinity;
-    cards.forEach((c, i) => { const d = Math.abs(c.offsetLeft - pad - track.scrollLeft); if (d < bd) { bd = d; carIdx = i; } });
-  }
-  cards.forEach((c, i) => c.classList.toggle('on', i === carIdx));
-  [...$('tcar-dots').children].forEach((d, i) => d.classList.toggle('on', i === carIdx));
-  $('tcar-go').textContent = `Scegli ${Object.values(TYPES)[carIdx].label}`;
-}
-$('tcar').addEventListener('scroll', () => requestAnimationFrame(syncCar), { passive:true });
-// Finger or mouse: the cards follow the hand, and on release a short drag
-// (SWIPE_PX) or a quick flick is enough to move one card on or back.
-const SWIPE_PX = 24, FLICK = 0.12;   // px, px per ms
-{
-  const track = $('tcar');
-  let x0 = 0, s0 = 0, t0 = 0, from = 0, drag = false, moved = 0;
-  track.addEventListener('pointerdown', e => {
-    drag = true; moved = 0; x0 = e.clientX; s0 = track.scrollLeft; t0 = performance.now(); from = carIdx;
-  });
-  window.addEventListener('pointermove', e => {
-    if (!drag) return;
-    moved = Math.max(moved, Math.abs(e.clientX - x0));
-    track.scrollLeft = s0 - (e.clientX - x0);
-  });
-  const end = e => {
-    if (!drag) return;
-    drag = false;
-    const dx = e.clientX - x0, v = Math.abs(dx) / Math.max(1, performance.now() - t0);
-    const step = Math.abs(dx) > SWIPE_PX || v > FLICK ? (dx < 0 ? 1 : -1) : 0;
-    carTo(Math.max(0, Math.min(track.children.length - 1, from + step)));
-  };
-  window.addEventListener('pointerup', end);
-  window.addEventListener('pointercancel', end);
-  // a drag is not a tap on the card under the hand
-  track.addEventListener('click', e => { if (moved > 8) e.stopPropagation(); }, true);
-}
-$('tcar-go').addEventListener('click', () => chooseType(Object.keys(TYPES)[carIdx], $('tcar').children[carIdx]));
 function chooseType(k, btn) {
   if (typeBusy) return;
   typeBusy = true;
@@ -1427,6 +1415,12 @@ function renderDeck() {
   const front = cardEl(i, false);
   deckEl.appendChild(front);
   makeSwipeable(front);
+  if (!S.briefed) {
+    $('howto-sub').textContent = `Ti mostriamo ${DECK.length} immagini: rispondi d'istinto. Dalle tue risposte nasce il tuo profilo di stile, e da lì le palette pensate per te.`;
+    $('howto-fan').replaceChildren(...[2, 1, 0].map(j => Object.assign(new Image(), { src:U(IMG[DECK[j]].id, 900), alt:'' })));
+  }
+  $('howto').hidden = S.briefed;
+  $('howto').classList.remove('gone');
   // the guide runs only until the visitor first touches the deck
   const teach = !S.touched;
   front.classList.toggle('nudge', teach);
@@ -1508,6 +1502,11 @@ function makeSwipeable(card) {
   card.addEventListener('pointercancel', end);
 }
 RINGS.forEach((id, v) => $(id).addEventListener('click', () => decide(v)));
+$('howto-go').addEventListener('click', () => {
+  S.briefed = true;
+  $('howto').classList.add('gone');
+  later(() => { $('howto').hidden = true; }, 350);
+});
 
 // ── 3 · A OR B ──
 let abBusy = false;
