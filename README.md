@@ -14,7 +14,7 @@ Un solo percorso. Se nello showroom ci sono due schermi, mostrano la stessa cosa
 
 | Fase | Cosa fa il cliente | Cosa raccoglie il sistema |
 |---|---|---|
-| 0 · Attract | Vede un muro di immagini che scorre, tocca un punto qualsiasi dello schermo (o "Inizia") | — |
+| 0 · Attract | Vede una stanza che cambia colore: ogni 5 secondi una nuova mano scende sulla parete, con il nome del colore della Colour Wall. Tocca un punto qualsiasi dello schermo (o "Inizia") | — |
 | 1 · Ambiente | Sceglie lo spazio da una griglia alta quanto lo schermo: casa, hotel, ristorante, negozio, ufficio, business, wellness | la tipologia: decide le foto delle fasi 2 e 3 e cosa disegna l'AI |
 | 2 · Esplora | Prima una schermata spiega che dalle risposte nasce il suo profilo e mostra le tre risposte con i gesti; poi 16 immagini: le 8 della tipologia scelta alternate a 8 ispirazioni comuni (paesaggi, arte, architettura, materia). "Non fa per me", "Mi incuriosisce" o "Mi rappresenta", anche trascinando (sinistra, su, destra). "Annulla" riporta l'ultima foto | −1 / +1 / +3 ai linguaggi di ogni immagine |
 | 3 · Scegli | 6 confronti A oppure B, diversi per ogni tipologia. "Annulla" riporta l'ultimo confronto (dal primo, l'ultima foto di Esplora) | +3 ai linguaggi dell'ambiente scelto |
@@ -47,8 +47,7 @@ sul telefono chiede ogni 5 secondi (per 20 minuti al massimo) e, appena lo trova
 diventa il progetto, come se il QR finale fosse stato inquadrato.
 
 La fase 6 apre la proposta appena finite le osservazioni: le immagini ancora in
-lavorazione arrivano lì, segnate "in arrivo". Durante la fase 5 il ritorno automatico
-all'inizio scatta dopo 6 minuti invece di 2: il cliente è alla parete dei campioni.
+lavorazione arrivano lì, segnate "in arrivo".
 
 ## Salvare e condividere
 
@@ -79,11 +78,9 @@ Le misure sono in `rem`, e 1rem vale 12px più l'1% della larghezza del frame:
 circa 16px su un telefono, circa 23px su un 1080×1920. Testi e icone restano
 leggibili da vicino senza diventare enormi; lo spazio in più va alle immagini.
 
-Dopo 2 minuti senza tocchi l'app torna alla schermata iniziale e cancella le
-scelte: il cliente dopo non trova il profilo di chi c'era prima. Negli ultimi 15
-secondi compare "Sei ancora qui?" con il conto alla rovescia: un tocco qualsiasi
-tiene la sessione, per chi sta ancora leggendo o ne parla con un consulente. Un
-link aperto sul telefono non si azzera mai e non ha il pulsante per ricominciare.
+L'app non torna da sola all'inizio: resta dov'è finché qualcuno preme
+"Ricomincia" in alto, che cancella le scelte per il cliente dopo. Un link aperto
+sul telefono non ha il pulsante per ricominciare.
 
 ## L'AI (facoltativa)
 
@@ -138,10 +135,10 @@ con i colori dell'app al posto della Colour Wall (il catalogo non si può legger
 
 Il resto è in `index.html`, nello script:
 
+- `ROOM` e `assets/stanza/` — la stanza della schermata iniziale: la stessa foto ridipinta una volta sola con l'AI della prova sulla stanza (`api/repaint.js`), un'immagine per colore, nello stesso ordine della lista.
 - `ARCH` — i sette linguaggi: nome, descrizione, palette di 5 colori (nell'ordine base, supporto, accento, profondità, dettaglio).
 - `PRODUCTS` — le finiture suggerite per ogni linguaggio.
 - `IMG`, `TYPES`, `SHARED` — le immagini, e per ogni tipologia le sue 8 foto del mazzo (`own`) e i 6 confronti (`pairs`); `SHARED` sono le 8 ispirazioni comuni. Ogni foto ha i linguaggi che evoca.
-- `IDLE_MS` — il tempo prima del ritorno alla schermata iniziale; `IDLE_WARN` — quanto dura il conto alla rovescia di "Sei ancora qui?".
 
 ## Note
 
