@@ -79,8 +79,68 @@ circa 16px su un telefono, circa 23px su un 1080×1920. Testi e icone restano
 leggibili da vicino senza diventare enormi; lo spazio in più va alle immagini.
 
 L'app non torna da sola all'inizio: resta dov'è finché qualcuno preme
-"Ricomincia" in alto, che cancella le scelte per il cliente dopo. Un link aperto
-sul telefono non ha il pulsante per ricominciare.
+"Ricomincia" in alto o tocca il logo. Tutti e due chiedono conferma e cancellano le
+scelte per il cliente dopo. Sul telefono non c'è il pulsante per ricominciare e il
+logo non fa niente.
+
+## Il profilo: cosa è misurato
+
+Il profilo nasce da sette linguaggi: neutro, caldo, naturale, sofisticato, audace,
+minimale, materico. I loro nomi e i confini tra l'uno e l'altro sono una scelta;
+il resto è misurato, con le stesse regole per i colori del muro e per le foto.
+
+**Le misure.** Ogni colore si misura in CIELAB, lo spazio colore standard della CIE
+costruito perché le distanze seguano la vista: chiarezza L\*, croma C\* (quanto
+colore ha) e tinta h. Il caldo/freddo è il *colour heat* di Ou, Luo, Woodcock e
+Wright (2004): −0,5 + 0,02 · C\*^1,07 · cos(h − 50°), positivo per i colori caldi.
+
+**I linguaggi** (`LANG_RULES` in `index.html`). Un colore può stare in più linguaggi;
+dei 192 della Colour Wall uno solo, Gentle Savanna, non entra in nessuno.
+
+| Linguaggio | Regola |
+|---|---|
+| Neutro | croma sotto 12, chiarezza tra 30 e 90: poco colore, né bianco né nero |
+| Minimale | croma sotto 7, chiarezza sopra 88 o sotto 30: quasi senza colore, agli estremi |
+| Caldo | colour heat di Ou positivo |
+| Audace | croma da 18 in su: colori pieni |
+| Naturale | tinta tra 90° e 230° (verdi, verde acqua, azzurri), croma da 6 |
+| Sofisticato | tinta tra 230° e 40° (blu, viola, prugna, malva), croma tra 4 e 28: polverosi |
+| Materico | tinta tra 30° e 90° (terre), croma tra 6 e 30, chiarezza tra 20 e 92: calce, argilla, pietra |
+
+**Le palette** (`compose`). Per ogni linguaggio la pagina compone 5 colori della
+Colour Wall con i risultati di Schloss e Palmer (2011): due colori sembrano più
+armonici quanto più le loro tinte sono vicine, e piacciono di più quanto più sono
+lontani in chiarezza; un colore "figura" piace di più quanto più la sua tinta
+contrasta con lo sfondo. Quindi le tre pareti (base, supporto, profondità) hanno
+tinte vicine (differenza di tinta CIE ΔH\*ab) e chiarezze lontane; l'accento è la
+figura, con la tinta più lontana dalle pareti; il dettaglio accompagna l'accento. I
+linguaggi con meno colori scelgono per primi e ogni colore va a un solo linguaggio:
+le sette palette non hanno colori in comune, e quindi nemmeno le tre del cliente.
+
+**Le foto.** I linguaggi di ogni foto (`tags` in `IMG`) sono misurati dai suoi colori
+con `tools/misura-foto.js`: i 6 colori principali della foto come appare nell'app
+(k-means in CIELAB su una miniatura), ognuno nei linguaggi con le regole sopra,
+pesato per l'area che occupa e un po' di più se è saturo, perché le zone colorate
+attirano lo sguardo. Ogni linguaggio diventa poi un punteggio standard rispetto a
+tutte le foto (di quante deviazioni standard la foto si stacca dalla media): una foto
+è "naturale" quando ha molti più colori naturali della foto media. Restano i
+linguaggi almeno una deviazione standard sopra la media, al massimo 3; se nessuno ci
+arriva, il più alto. Se cambiate le foto, rilanciate lo script (le istruzioni sono
+nel file).
+
+**I confronti A/B.** Le due foto di ogni coppia mostrano lo stesso spazio e non hanno
+linguaggi in comune, così ogni scelta sposta il profilo. La cucina verde di Casa
+(`assets/foto/cucina-verde.webp`) è generata con l'AI dell'app, perché le altre cucine
+erano tutte "neutro"; in `IMG` una foto dell'app ha il percorso al posto dell'id Unsplash.
+
+**Cosa resta una scelta.** I nomi dei linguaggi e le soglie delle regole; i pesi
+delle risposte (−1, +1, +3 nelle foto, +3 nei confronti, +4 per ogni linguaggio
+scelto); quanto conta la saturazione nelle foto. La misura guarda il colore, non la
+materia o lo stile: "materico" sono le terre, non la grana di una superficie.
+
+Fonti:
+[Ou, Luo, Woodcock, Wright (2004), *A study of colour emotion and colour preference. Part I: Colour emotions for single colours*, Color Research & Application 29(3), 232–240](https://doi.org/10.1002/col.20010);
+[Schloss, Palmer (2011), *Aesthetic response to color combinations: preference, harmony, and similarity*, Attention, Perception, & Psychophysics 73, 551–571](https://doi.org/10.3758/s13414-010-0027-0).
 
 ## L'AI (facoltativa)
 
@@ -88,7 +148,7 @@ Funzioni server in `api/` (più `api/scan.js` per il QR delle palette), che Verc
 
 | File | Quando | Cosa fa |
 |---|---|---|
-| `api/proposal.js` | dopo il linguaggio | scrive profilo, osservazioni e **tre palette** di colori liberi (nome + hex), con Google Gemini su Comfy Cloud |
+| `api/proposal.js` | dopo il linguaggio | scrive profilo, osservazioni e il nome e la frase delle **tre palette**, che compone la pagina (vedi "Il profilo: cosa è misurato"), con Google Gemini su Comfy Cloud |
 | `api/room.js` | dopo la scelta delle palette | per ogni palette scelta disegna tre spazi diversi della tipologia e un moodboard, con Nano Banana su Comfy Cloud (circa 15 s a immagine) |
 | `api/repaint.js` | sul telefono, "Prova i colori sulla tua stanza" | carica la foto su **Comfy Cloud** e ne ridipinge le pareti con **GPT Image 2** (stesso nodo e stessa chiave di ManyTask e LeadWin). Circa 40 secondi: la pagina chiede ogni 3 s se è pronta |
 
@@ -96,13 +156,13 @@ Funzioni server in `api/` (più `api/scan.js` per il QR delle palette), che Verc
   `COMFY_API_KEY`: in locale nel file `.env` (copia `.env.example`), online
   nelle Environment Variables di Vercel. Senza chiave il percorso usa le palette
   calcolate in locale e il telefono dice "La prova sulla tua stanza non è ancora attiva".
-- **L'AI non può inventare colori.** Appena composte le palette, la pagina porta
-  ogni colore sul colore della Colour Wall più vicino alla vista (distanza CIELAB,
-  ogni colore del muro al massimo una volta per palette), e i prodotti sono quelli
-  per il linguaggio della palette.
+- **L'AI non sceglie i colori.** Le palette le compone la pagina dalla Colour Wall
+  con le regole qui sotto; il modello riceve i nomi dei colori e scrive solo il nome
+  e la frase di ogni palette. I prodotti sono quelli Sikkens per il linguaggio della
+  palette.
 - **Nessun errore a schermo.** Se l'AI non risponde (niente chiave, rete giù,
-  errore del modello) la sessione usa tre palette calcolate in locale dai
-  linguaggi più forti e le foto del percorso.
+  errore del modello) la sessione usa le stesse palette, con i nomi dei linguaggi,
+  e le foto del percorso.
 - **Costi.** 1 testo + 4 immagini per ogni palette scelta (da 4 a 12 per cliente),
   3 alla volta (`IMG_PARALLEL`). Le palette non scelte non vengono disegnate.
 - **Modelli:** si cambiano nei file di `api/`. I nomi validi sono quelli dei nodi
@@ -136,14 +196,15 @@ con i colori dell'app al posto della Colour Wall (il catalogo non si può legger
 Il resto è in `index.html`, nello script:
 
 - `ROOM` e `assets/stanza/` — la stanza della schermata iniziale: la stessa foto ridipinta una volta sola con l'AI della prova sulla stanza (`api/repaint.js`), un'immagine per colore, nello stesso ordine della lista.
-- `ARCH` — i sette linguaggi: nome, descrizione, palette di 5 colori (nell'ordine base, supporto, accento, profondità, dettaglio).
+- `ARCH` — i sette linguaggi: nome e descrizione. Le loro palette di 5 colori (base, supporto, accento, profondità, dettaglio) le compone la pagina dalla Colour Wall; quelle scritte qui valgono solo se il catalogo non si legge (pagina aperta da file).
+- `LANG_RULES` e `compose` — le regole dei linguaggi e delle palette (vedi "Il profilo: cosa è misurato").
 - `PRODUCTS` — le finiture suggerite per ogni linguaggio.
-- `IMG`, `TYPES`, `SHARED` — le immagini, e per ogni tipologia le sue 8 foto del mazzo (`own`) e i 6 confronti (`pairs`); `SHARED` sono le 8 ispirazioni comuni. Ogni foto ha i linguaggi che evoca.
+- `IMG`, `TYPES`, `SHARED` — le immagini, e per ogni tipologia le sue 8 foto del mazzo (`own`) e i 6 confronti (`pairs`); `SHARED` sono le 8 ispirazioni comuni. I linguaggi di ogni foto (`tags`) sono misurati con `tools/misura-foto.js`.
 
 ## Note
 
-- Senza AI il profilo lo calcolano dei pesi in locale; con l'AI i pesi restano
-  la base e il modello scrive testi e palette sopra di essi.
+- Il profilo lo calcolano sempre i pesi in locale e le palette le compongono le
+  regole; con l'AI il modello scrive i testi: profilo, osservazioni, nomi delle palette.
 - Le foto sono Unsplash, da sostituire con i progetti e i campioni FinishDecor.
 - Il QR arriva da cdnjs (`qrcodejs`, versione fissata). Se non si carica,
   resta il bottone per copiare o condividere il link.
