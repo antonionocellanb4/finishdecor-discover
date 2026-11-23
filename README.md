@@ -14,16 +14,16 @@ Un solo percorso. Se nello showroom ci sono due schermi, mostrano la stessa cosa
 
 | Fase | Cosa fa il cliente | Cosa raccoglie il sistema |
 |---|---|---|
-| 0 · Attract | Vede un muro di immagini che scorre, tocca "Inizia" | — |
+| 0 · Attract | Vede un muro di immagini che scorre, tocca un punto qualsiasi dello schermo (o "Inizia") | — |
 | 1 · Ambiente | Sceglie lo spazio da una griglia alta quanto lo schermo: casa, hotel, ristorante, negozio, ufficio, business, wellness | la tipologia: decide le foto delle fasi 2 e 3 e cosa disegna l'AI |
-| 2 · Esplora | Prima una schermata spiega che dalle risposte nasce il suo profilo e mostra le tre risposte con i gesti; poi 16 immagini: le 8 della tipologia scelta alternate a 8 ispirazioni comuni (paesaggi, arte, architettura, materia). "Non fa per me", "Mi incuriosisce" o "Mi rappresenta", anche trascinando (sinistra, su, destra) | −1 / +1 / +3 ai linguaggi di ogni immagine |
-| 3 · Scegli | 6 confronti A oppure B, diversi per ogni tipologia | +3 ai linguaggi dell'ambiente scelto |
-| 4 · Linguaggio | Sceglie fino a tre approcci tra neutro, caldo, naturale, sofisticato, audace, minimale, materico | +4 a ciascuno |
-| 5 · Palette | Vede le sue tre palette con i nomi della Colour Wall Sikkens (es. Mild Sage, da cercare sul muro) e un QR "Portale con te". Quando il telefono apre il QR, lo schermo passa a "Continua il percorso" con una mazzetta nei suoi colori che si apre a ventaglio, finché fa il giro fisico dei campioni. Dopo 1 minuto (`WAIT_MS`) compare il pulsante "Continua il percorso", che riporta le stesse palette come "Scegli la tua palette", una, due o tutte e tre. Con "Cambia colori" e un tocco su un colore lo sostituisce con uno visto sul muro: la scheda mostra i 192 colori della Colour Wall, famiglia per famiglia come sul muro. Senza telefono: "Continua senza telefono" | le palette scelte |
-| 6 · Il progetto | Legge le osservazioni dell'AI mentre l'AI disegna, per ogni palette scelta, tre spazi diversi della sua tipologia e un moodboard | — |
+| 2 · Esplora | Prima una schermata spiega che dalle risposte nasce il suo profilo e mostra le tre risposte con i gesti; poi 16 immagini: le 8 della tipologia scelta alternate a 8 ispirazioni comuni (paesaggi, arte, architettura, materia). "Non fa per me", "Mi incuriosisce" o "Mi rappresenta", anche trascinando (sinistra, su, destra). "Annulla" riporta l'ultima foto | −1 / +1 / +3 ai linguaggi di ogni immagine |
+| 3 · Scegli | 6 confronti A oppure B, diversi per ogni tipologia. "Annulla" riporta l'ultimo confronto (dal primo, l'ultima foto di Esplora) | +3 ai linguaggi dell'ambiente scelto |
+| 4 · Linguaggio | Sceglie fino a tre approcci tra neutro, caldo, naturale, sofisticato, audace, minimale, materico; il sottotitolo conta le scelte e un quarto viene rifiutato con un messaggio | +4 a ciascuno |
+| 5 · Palette | Vede le sue tre palette con i nomi della Colour Wall Sikkens (es. Mild Sage, da cercare sul muro) e un QR "Portale con te". Quando il telefono apre il QR, lo schermo passa a "Continua il percorso" con una mazzetta nei suoi colori che si apre a ventaglio, finché fa il giro fisico dei campioni. Dopo 1 minuto (`WAIT_MS`) compare il pulsante "Scegli la tua palette", che riporta le stesse palette da scegliere, una, due o tutte e tre. Con "Cambia colori" e un tocco su un colore lo sostituisce con uno visto sul muro: la scheda mostra i 192 colori della Colour Wall, famiglia per famiglia come sul muro. Senza telefono: il pulsante "Continua senza telefono" | le palette scelte |
+| 6 · Il progetto | Legge le osservazioni dell'AI mentre l'AI disegna, per ogni palette scelta, tre spazi diversi della sua tipologia e un moodboard. "Vedi il tuo progetto" compare con l'ultima osservazione | — |
 | Proposta | Nome del profilo e, per ogni palette scelta: i colori con il nome della Colour Wall, tre spazi (per un hotel: camera, hall, bagno), il moodboard, i prodotti | — |
 
-La pillola "Profilo" in alto mostra il profilo che si forma a ogni scelta.
+La pillola in alto mostra i due linguaggi in testa, aggiornati a ogni scelta.
 
 **Il QR delle palette.** Il link porta le palette con sé (nomi e colori, circa
 300 caratteri dopo `#v=`): il telefono le mostra senza server. Porta anche un
@@ -39,8 +39,15 @@ Per provarlo col telefono in locale apri la pagina
 dall'indirizzo di rete del PC (es. `http://192.168.1.20:8137`), non da `localhost`,
 con telefono e PC sulla stessa rete.
 
-La fase 7 aspetta le immagini al massimo `AI_MAX` (90 s), poi apre la proposta e
-le immagini mancanti arrivano lì. Durante la fase 5 il ritorno automatico
+**Un solo QR.** Il telefono che ha inquadrato le palette riceve da solo anche il
+progetto finale. Quando lo schermo arriva alla proposta lascia il codice del
+progetto (lo stesso del link `#p=`) in `api/scan`, sotto l'id del QR, per 30
+minuti, e solo se un telefono ha davvero aperto quel QR. La pagina delle palette
+sul telefono chiede ogni 5 secondi (per 20 minuti al massimo) e, appena lo trova,
+diventa il progetto, come se il QR finale fosse stato inquadrato.
+
+La fase 6 apre la proposta appena finite le osservazioni: le immagini ancora in
+lavorazione arrivano lì, segnate "in arrivo". Durante la fase 5 il ritorno automatico
 all'inizio scatta dopo 6 minuti invece di 2: il cliente è alla parete dei campioni.
 
 ## Salvare e condividere
@@ -50,7 +57,8 @@ all'inizio scatta dopo 6 minuti invece di 2: il cliente è alla parete dei campi
 codici del catalogo. Il telefono che inquadra il codice ricostruisce la proposta,
 con le foto del percorso al posto delle immagini dell'AI (quelle restano sullo
 schermo dello showroom: per portarle a casa servirebbe salvarle su un server).
-Nessun dato del cliente salvato da nessuna parte.
+Nessun dato del cliente viene salvato, tranne il codice del progetto per 30 minuti
+quando un telefono ha inquadrato il QR delle palette (vedi "Un solo QR").
 
 **Prova i colori sulla tua stanza.** Nel progetto aperto sul telefono il bottone
 in basso non è più "Porta a casa il progetto" (il progetto è già lì) ma "Prova
@@ -72,8 +80,10 @@ circa 16px su un telefono, circa 23px su un 1080×1920. Testi e icone restano
 leggibili da vicino senza diventare enormi; lo spazio in più va alle immagini.
 
 Dopo 2 minuti senza tocchi l'app torna alla schermata iniziale e cancella le
-scelte: il cliente dopo non trova il profilo di chi c'era prima. Un link aperto
-sul telefono non si azzera mai.
+scelte: il cliente dopo non trova il profilo di chi c'era prima. Negli ultimi 15
+secondi compare "Sei ancora qui?" con il conto alla rovescia: un tocco qualsiasi
+tiene la sessione, per chi sta ancora leggendo o ne parla con un consulente. Un
+link aperto sul telefono non si azzera mai e non ha il pulsante per ricominciare.
 
 ## L'AI (facoltativa)
 
@@ -131,7 +141,7 @@ Il resto è in `index.html`, nello script:
 - `ARCH` — i sette linguaggi: nome, descrizione, palette di 5 colori (nell'ordine base, supporto, accento, profondità, dettaglio).
 - `PRODUCTS` — le finiture suggerite per ogni linguaggio.
 - `IMG`, `TYPES`, `SHARED` — le immagini, e per ogni tipologia le sue 8 foto del mazzo (`own`) e i 6 confronti (`pairs`); `SHARED` sono le 8 ispirazioni comuni. Ogni foto ha i linguaggi che evoca.
-- `IDLE_MS` — il tempo prima del ritorno alla schermata iniziale.
+- `IDLE_MS` — il tempo prima del ritorno alla schermata iniziale; `IDLE_WARN` — quanto dura il conto alla rovescia di "Sei ancora qui?".
 
 ## Note
 

@@ -99,6 +99,16 @@ export async function peek(key) {
   const e = mem.get(key);
   return e && e.until > Date.now() ? e.n : 0;
 }
+// A short text kept `secs` seconds (the finished project, for the phone that took the palettes)
+export async function save(key, text, secs) {
+  if (KV_URL && KV_TOKEN) return redis('SET', key, text, 'EX', secs);
+  mem.set(key, { text, until: Date.now() + secs * 1000 });
+}
+export async function load(key) {
+  if (KV_URL && KV_TOKEN) return (await redis('GET', key)) || null;
+  const e = mem.get(key);
+  return e && e.until > Date.now() ? e.text : null;
+}
 // The paid calls, capped per visitor (their IP) per hour, and for everybody per day,
 // so a link passed around cannot run up the bill. AI_MOCK costs nothing: no cap.
 export async function limit(req, what, perIpHour, perDay) {

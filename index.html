@@ -111,9 +111,11 @@ img{display:block}
   min-height:2.25rem;padding:0 0.75rem 0 0.5rem;border-radius:999px;
   border:1px solid var(--block-line);font-size:0.875rem;color:var(--label);white-space:nowrap;
   background:rgba(38,38,38,0.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
-  transition:background .15s;
+  transition:background .15s;min-width:0;
 }
 .meta-btn:active{background:var(--fill)}
+/* the profile's two leading languages: on a narrow frame they shorten instead of pushing the restart button out */
+#profile-name{overflow:hidden;text-overflow:ellipsis}
 .icon-btn{
   width:2.25rem;height:2.25rem;flex:0 0 auto;border-radius:50%;
   border:1px solid var(--block-line);
@@ -125,7 +127,7 @@ img{display:block}
 .icon-btn svg{width:1.0625rem;height:1.0625rem}
 .meta-btn:focus-visible,.icon-btn:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 /* Three dots that ARE the profile's current palette — colour as information */
-.pill-dots{display:flex}
+.pill-dots{display:flex;flex:0 0 auto}
 .pill-dots i{
   width:0.75rem;height:0.75rem;border-radius:50%;
   background:var(--surface-2);border:1.5px solid var(--bg);
@@ -234,7 +236,7 @@ img{display:block}
    three round buttons below: two small glass ones, the big white "it is me"
    in the middle. Progress runs as thin segments under the header. A drag only
    lights up the button it is heading for — no stickers on the photo. */
-.screen-explore{padding:0}
+.screen-explore{padding:0;container:explore / inline-size}
 .deck{position:absolute;top:calc(var(--safe-t) + 4rem);left:0.75rem;right:0.75rem;bottom:max(0.75rem, var(--safe-b))}
 .card{
   position:absolute;inset:0;overflow:hidden;touch-action:none;cursor:grab;border-radius:2rem;
@@ -304,6 +306,22 @@ img{display:block}
   white-space:nowrap;font-size:0.8125rem;color:rgba(255,255,255,0.8);
   pointer-events:none;
 }
+/* "Annulla" brings back the last answer. On the monitor it sits low on the left,
+   level with the buttons and within reach; a narrow frame has no room beside them,
+   so there it goes under the progress bars. */
+.undo{display:inline-flex;align-items:center;justify-content:center;gap:0.4375rem}
+.undo svg{width:1.125rem;height:1.125rem;flex:0 0 auto}
+.deck-undo{
+  position:absolute;z-index:5;left:1.75rem;bottom:calc(max(0.625rem, var(--safe-b)) + 3.125rem);   /* centred on the 4.5rem row */
+  min-height:2.75rem;padding:0 1rem 0 0.8125rem;border-radius:999px;
+  font-size:0.9375rem;font-weight:500;color:#fff;
+  background:rgba(38,38,38,0.62);border:1px solid rgba(255,255,255,0.14);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  transition:transform .15s;
+}
+.deck-undo:active{transform:scale(0.95)}
+.deck-undo:focus-visible{outline:2px solid var(--tint);outline-offset:3px}
+@container explore (max-width:40rem){.deck-undo{bottom:auto;top:calc(var(--safe-t) + 6rem);left:auto;right:1.75rem}}
 /* Swipe guide on the first photo, the pattern apps use: a solid hand presses
    (a touch ring lights under the fingertip), drags leaving a trail, lifts and
    fades — right, then left, then up. The photo follows each drag a little and
@@ -429,17 +447,19 @@ img{display:block}
   flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
   padding:0.5rem;background:var(--block);border:1px solid var(--block-line);border-radius:var(--r-sheet);
 }
+/* the seven languages share the panel's height: on the monitor each row is a big target, no empty half */
+#ap-list{display:flex;flex-direction:column;container-type:size}
 .ap{
-  display:flex;align-items:center;gap:0.75rem;width:100%;text-align:left;
+  flex:1 0 auto;display:flex;align-items:center;gap:0.75rem;width:100%;text-align:left;
   padding:0.625rem 0.75rem;border-radius:calc(var(--r-sheet) - 0.5rem);
   transition:background .15s;
 }
 .ap:active{background:rgba(255,255,255,0.06)}
-.ap-strip{flex:0 0 auto;display:grid;grid-template-columns:repeat(5,0.625rem);height:2.75rem;border-radius:0.5rem;overflow:hidden}
+.ap-strip{flex:0 0 auto;display:grid;grid-template-columns:repeat(5,1fr);height:clamp(2.75rem,7cqh,5rem);aspect-ratio:8/7;border-radius:0.5rem;overflow:hidden}
 .ap-body{flex:1 1 auto;min-width:0}
 .ap-name,.ap-desc{display:block}
-.ap-name{font-size:1.125rem;font-weight:500}
-.ap-desc{font-size:0.875rem;color:var(--label-2);line-height:1.35}
+.ap-name{font-size:1.25rem;font-weight:500}
+.ap-desc{font-size:0.9375rem;color:var(--label-2);line-height:1.35}
 .ap svg,.pal svg{
   width:1.75rem;height:1.75rem;flex:0 0 auto;padding:0.3125rem;border-radius:50%;
   border:1.5px solid var(--line);color:transparent;transition:background .15s,color .15s,border-color .15s;
@@ -473,7 +493,9 @@ img{display:block}
   content:'';position:absolute;left:0;right:0;bottom:0;height:55%;z-index:-1;pointer-events:none;
   background:radial-gradient(110% 70% at 50% 115%, rgba(232,88,30,0.45) 0%, rgba(150,40,14,0.22) 40%, transparent 72%);
 }
-.ai-swatches{display:flex;justify-content:center;gap:0.625rem;margin-bottom:2rem}
+.ai-swatches{display:flex;justify-content:center;gap:0.625rem;margin:auto 0 2rem}
+/* the button at the bottom like on every other screen; its place is kept, so nothing jumps when it shows */
+.screen-ai .actions{margin-top:auto;min-height:3.25rem}
 .ai-swatches i{
   width:3.25rem;height:3.25rem;border-radius:50%;background:var(--surface-2);
   transition:background .9s ease,transform .9s cubic-bezier(0.32,0.72,0,1);
@@ -510,7 +532,7 @@ img{display:block}
 .pal-dot{padding:0.25rem 0.125rem;border-radius:0.75rem;transition:background .15s}
 .pal-dot:active{background:rgba(255,255,255,0.1)}
 /* "Cambia colori" opens one palette for editing: its colours ring in amber and take touches */
-.pal-edit{position:relative;align-self:flex-start;min-height:2.25rem;padding:0 1rem;border-radius:999px;background:var(--fill);font-size:0.875rem;font-weight:500}
+.pal-edit,.pals-qr-skip{position:relative;align-self:flex-start;min-height:2.25rem;padding:0 1rem;border-radius:999px;background:var(--fill);font-size:0.875rem;font-weight:500}
 .pals.look .pal-edit{display:none}
 .pal.editing .pal-dots{background:rgba(255,255,255,0.1)}
 .pal.editing .pal-dot{pointer-events:auto}
@@ -560,7 +582,7 @@ img{display:block}
 .pals-qr-body{flex:1 1 auto;min-width:0}
 .pals-qr-title{font-size:1.0625rem;font-weight:500;line-height:1.25}
 .pals-qr-text{font-size:0.8125rem;line-height:1.4;color:var(--label-2);margin-top:0.125rem}
-.pals-qr-skip{margin-top:0.25rem;padding:0.375rem 0;font-size:0.75rem;font-weight:500;color:var(--label-2);text-decoration:underline;text-underline-offset:0.2em}
+.pals-qr-skip{margin-top:0.5rem}
 /* the wait in the showroom: a centred message and the fan deck in the palettes' colours */
 #s-pals.center{justify-content:center;text-align:center}
 #s-pals.center .screen-head{margin-bottom:0}
@@ -738,7 +760,7 @@ img{display:block}
 .toast{
   position:absolute;left:50%;bottom:6rem;z-index:95;transform:translate(-50%,0.5rem);
   padding:0.625rem 1rem;border-radius:999px;background:var(--surface-2);
-  font-size:0.9375rem;font-weight:500;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;
+  font-size:0.9375rem;font-weight:500;white-space:nowrap;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;
 }
 .toast.show{opacity:1;transform:translate(-50%,0)}
 
@@ -760,7 +782,7 @@ img{display:block}
       <span class="phase-label" id="phase-label"></span>
       <button class="meta-btn" id="profile-open" type="button" hidden>
         <span class="pill-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span id="profile-pct">Profilo 0%</span>
+        <span id="profile-name">Il tuo profilo</span>
       </button>
       <button class="icon-btn" id="restart" type="button" aria-label="Ricomincia" hidden>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.4 4.4v5.2h5.2"/></svg>
@@ -812,6 +834,7 @@ img{display:block}
       <button class="act act-sm" id="deck-mid" type="button" aria-label="Mi incuriosisce"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="act-label">Mi incuriosisce</span></button>
       <button class="act act-lg" id="deck-yes" type="button" aria-label="Mi rappresenta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.2s-7.2-4.4-9.1-8.9C1.5 8 3.6 4.7 7 4.7c2.1 0 3.5 1.1 5 2.9 1.5-1.8 2.9-2.9 5-2.9 3.4 0 5.5 3.3 4.1 6.6-1.9 4.5-9.1 8.9-9.1 8.9z"/></svg><span class="act-label">Mi rappresenta</span></button>
     </div>
+    <button class="undo deck-undo" id="deck-undo" type="button" aria-label="Annulla l'ultima scelta" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>Annulla</button>
     <!-- before the first photo: why the visitor answers, and how -->
     <div class="howto" id="howto" hidden>
       <div class="screen-head">
@@ -835,13 +858,14 @@ img{display:block}
       <p class="screen-sub" id="ab-sub"></p>
     </div>
     <div class="ab" id="ab"></div>
+    <div class="actions"><button class="btn-quiet undo" id="ab-undo" type="button" aria-label="Annulla l'ultima scelta" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>Annulla</button></div>
   </section>
 
   <!-- 4 · IL TUO RAPPORTO CON IL COLORE -->
   <section class="screen" id="s-approach" hidden>
     <div class="screen-head">
       <h2 class="screen-title">Quale linguaggio senti tuo?</h2>
-      <p class="screen-sub">Scegli fino a tre approcci al colore.</p>
+      <p class="screen-sub" id="ap-sub">Scegli fino a tre approcci al colore.</p>
     </div>
     <div class="panel" id="ap-list"></div>
     <div class="actions"><button class="btn-primary" id="ap-done" type="button" disabled>Scegline almeno uno</button></div>
@@ -854,7 +878,7 @@ img{display:block}
       <h2 class="screen-title" id="pals-title">Le tue palette</h2>
       <p class="screen-sub" id="pals-sub"></p>
       <div class="fan" id="fan" aria-hidden="true" hidden></div>
-      <button class="btn-primary wait-go" id="wait-go" type="button" hidden>Continua il percorso</button>
+      <button class="btn-primary wait-go" id="wait-go" type="button" hidden>Scegli la tua palette</button>
     </div>
     <p class="ai-status" id="pals-wait" role="status" hidden>Sto componendo le tue palette</p>
     <div class="pals" id="pals" hidden></div>
@@ -862,7 +886,7 @@ img{display:block}
       <div class="qr" id="pals-qr-code" role="img" aria-label="Codice QR delle tue palette"></div>
       <div class="pals-qr-body">
         <p class="pals-qr-title">Portale con te</p>
-        <p class="pals-qr-text">Inquadra il codice con il telefono: avrai le tue palette sotto mano mentre tocchi i colori nello showroom.</p>
+        <p class="pals-qr-text">Inquadra il codice con il telefono: avrai le tue palette sotto mano nello showroom e, alla fine del percorso, anche il progetto.</p>
         <button class="pals-qr-skip" id="pals-qr-skip" type="button">Continua senza telefono</button>
       </div>
     </div>
@@ -976,6 +1000,16 @@ img{display:block}
         <button class="btn-quiet" id="restart-no" type="button">Annulla</button>
         <button class="btn-primary" id="restart-yes" type="button">Ricomincia</button>
       </div>
+    </div>
+  </div>
+
+  <!-- before a walked-away session goes back to the start: any touch keeps it -->
+  <div class="modal" id="idle-modal" hidden>
+    <div class="modal-backdrop"></div>
+    <div class="modal-panel" role="alertdialog" aria-modal="true" aria-labelledby="idle-title" aria-describedby="idle-text">
+      <h2 id="idle-title">Sei ancora qui?</h2>
+      <p id="idle-text"></p>
+      <div class="actions"><button class="btn-primary" id="idle-stay" type="button">Continuo</button></div>
     </div>
   </div>
 
@@ -1265,8 +1299,8 @@ const TYPES = {
     {q:'Dove ti rilassi?', a:147, b:148}]},
 };
 let DECK = [], PAIRS = [];   // set by setType()
-const TOTAL = 16 + 6 + 2;   // deck + pairs + type, languages
 const IDLE_MS = 120000; // a showroom screen must not keep the last visitor's choices
+const IDLE_WARN = 15000;   // the last part of it is a countdown on screen: a touch keeps the session
 
 // The colour catalogue of the showroom's only brand, Sikkens: its Colour Wall.
 // Opened from file:// it cannot load, and the palettes keep the app's own colours.
@@ -1279,7 +1313,9 @@ let S;
 function fresh() {
   S = { scores:Object.fromEntries(KEYS.map(k => [k, 0])), ab:Object.fromEntries(KEYS.map(k => [k, 0])),
         liked:[], seenCats:{}, likedCats:{}, deckIdx:0, abIdx:0, type:null, brand:'sikkens',
-        approaches:[], pals:[], picks:[], prop:null, insights:[], decisions:0, shared:false, touched:false, briefed:false };
+        approaches:[], pals:[], picks:[], prop:null, insights:[], decisions:0, shared:false, touched:false, briefed:false,
+        hist:[],     // the answers in Esplora and Scegli, newest last: "Annulla" takes them back one by one
+        scan:null }; // the id of the palettes' QR once a phone has opened it: the project follows it there
 }
 fresh();
 // Steps that wait for an animation before moving on die with the session: a
@@ -1309,12 +1345,12 @@ const STEPS = ['intro', 'type', 'explore', 'ab', 'approach', 'pals', 'ai', 'resu
 const PHASE = { type:'Ambiente', explore:'Esplora', ab:'Scegli', approach:'Linguaggio', pals:'Palette', ai:'Il progetto', result:'Il tuo progetto' };
 let step = 'intro';
 
+// The pill names the two languages leading so far, so every answer visibly counts
 function updateProfilePill() {
-  $('profile-pct').textContent = `Profilo ${Math.round(S.decisions / TOTAL * 100)}%`;
-  const dots = document.querySelectorAll('#profile-open .pill-dots i');
-  const has = S.decisions > 0;
-  const pal = has ? ARCH[ranked()[0][0]].pal : null;
-  dots.forEach((d, i) => { d.style.background = has ? pal[[0, 2, 4][i]][1] : ''; });
+  const top = ranked().filter(([, v]) => v > 0).slice(0, 2);
+  $('profile-name').textContent = top.length ? top.map(([k]) => ARCH[k].label).join(' · ') : 'Il tuo profilo';
+  const pal = top.length ? ARCH[top[0][0]].pal : null;
+  document.querySelectorAll('#profile-open .pill-dots i').forEach((d, i) => { d.style.background = pal ? pal[[0, 2, 4][i]][1] : ''; });
 }
 
 function go(next) {
@@ -1323,7 +1359,7 @@ function go(next) {
   const i = STEPS.indexOf(next);
   document.querySelector('.topbar').hidden = next === 'intro'; // the attract screen is all picture
   $('phase-row').hidden = next === 'intro' || VIEW;
-  $('restart').hidden = next === 'intro' || VIEW;
+  $('restart').hidden = next === 'intro' || VIEW || S.shared;   // on the phone it would only wipe the visitor's own project
   $('profile-open').hidden = VIEW || !(i >= 2 && i <= 5);
   $('phase-label').textContent = next === 'result' ? PHASE.result : `Fase ${i} di 6 · ${PHASE[next] || ''}`;
   closeSheets();
@@ -1347,7 +1383,7 @@ function go(next) {
     $('mosaic-grid').appendChild(col);
   });
 }
-$('start').addEventListener('click', () => go('type'));
+$('s-intro').addEventListener('click', () => go('type'));   // a touch anywhere on the attract screen starts, not only on the button
 
 // ── 1 · TYPE OF SPACE ──
 function setType(t) {
@@ -1429,6 +1465,7 @@ function renderDeck() {
   const bars = $('deck-bars');
   if (!bars.children.length) DECK.forEach(() => bars.appendChild(document.createElement('i')));
   [...bars.children].forEach((b, j) => b.classList.toggle('done', j <= i));
+  $('deck-undo').hidden = !S.hist.length;
 }
 // Three answers, three weights: not for me / curious / it is me
 const RINGS = ['deck-no', 'deck-mid', 'deck-yes'];
@@ -1450,6 +1487,7 @@ function decide(v) {
   S.seenCats[it.cat] = (S.seenCats[it.cat] || 0) + 1;
   if (v > 0) { S.liked.push(idx); S.likedCats[it.cat] = (S.likedCats[it.cat] || 0) + 1; }
   S.decisions++;
+  S.hist.push({ v });
   updateProfilePill();
   hotRing(v);
   const front = deckEl.lastElementChild;
@@ -1530,6 +1568,7 @@ function renderAB() {
   });
   const nx = PAIRS[S.abIdx + 1];
   if (nx) [nx.a, nx.b].forEach(i => { new Image().src = U(IMG[i].id, 1080); });
+  $('ab-undo').hidden = !S.hist.length;
 }
 function chooseAB(btn, idx) {
   if (abBusy) return;
@@ -1537,6 +1576,7 @@ function chooseAB(btn, idx) {
   add(IMG[idx].tags, 3, S.ab);
   S.liked.push(idx);
   S.decisions++;
+  S.hist.push({ ab:idx });
   updateProfilePill();
   btn.classList.add('chosen');
   [...$('ab').children].forEach(x => { if (x !== btn) x.classList.add('dimmed'); });
@@ -1546,6 +1586,32 @@ function chooseAB(btn, idx) {
     if (S.abIdx >= PAIRS.length) go('approach'); else renderAB();
   }, 520);
 }
+
+// ── ANNULLA ──
+// Takes back the newest answer, the photo's or the pair's, and shows it again.
+// From the first pair it goes back to the last photo of Esplora.
+function undo() {
+  const h = S.hist.at(-1);
+  if (!h || deckBusy || abBusy) return;
+  S.hist.pop();
+  S.decisions--;
+  if ('ab' in h) {
+    add(IMG[h.ab].tags, -3, S.ab);
+    S.liked.pop();   // newest first, in the order the answers pushed them
+    S.abIdx--;
+    renderAB();
+  } else {
+    S.deckIdx--;
+    const it = IMG[DECK[S.deckIdx]];
+    add(it.tags, -VERDICT_W[h.v]);
+    // a count back at zero goes: the local insights rank the categories that are there
+    if (!--S.seenCats[it.cat]) delete S.seenCats[it.cat];
+    if (h.v > 0) { S.liked.pop(); if (!--S.likedCats[it.cat]) delete S.likedCats[it.cat]; }
+    if (step === 'explore') renderDeck(); else go('explore');
+  }
+  updateProfilePill();
+}
+['deck-undo', 'ab-undo'].forEach(id => $(id).addEventListener('click', undo));
 
 // ── AI (optional, see api/) ──
 // After the languages, the server composes three palettes of free colours;
@@ -1672,7 +1738,7 @@ function localProposal() {
 
 // ── 4 · APPROACHES ──
 const AP_ORDER = ['neutro', 'caldo', 'naturale', 'sofisticato', 'audace', 'minimale', 'materico'];
-function renderApproaches() {
+function renderApproaches(full) {
   const list = $('ap-list');
   list.textContent = '';
   AP_ORDER.forEach(k => {
@@ -1690,12 +1756,15 @@ function renderApproaches() {
     b.addEventListener('click', () => {
       const at = S.approaches.indexOf(k);
       if (at >= 0) S.approaches.splice(at, 1);
-      else { if (S.approaches.length >= 3) S.approaches.shift(); S.approaches.push(k); }
+      else if (S.approaches.length >= 3) return renderApproaches(true);   // a fourth is refused, and said so
+      else S.approaches.push(k);
       renderApproaches();
     });
     list.appendChild(b);
   });
   const n = S.approaches.length;
+  $('ap-sub').textContent = full ? 'Ne hai già scelti tre: togline uno per sceglierne un altro.'
+    : `Scegli fino a tre approcci al colore.${n ? ` Scelti: ${n} di 3.` : ''}`;
   $('ap-done').disabled = !n;
   $('ap-done').textContent = n ? 'Continua' : 'Scegline almeno uno';
 }
@@ -1716,6 +1785,7 @@ $('ap-done').addEventListener('click', () => {
 const WAIT_MS = 60000;   // the wait before "Continua il percorso" shows up
 // The phone that scans the QR opens this page in view mode (#v=…): only the palettes
 const VIEW = /^#v=/.test(location.hash);
+const SCAN = new URLSearchParams(location.search).get('scan');   // that page came from the QR: the project will follow
 let aiTimers = [];
 async function enterPals() {
   aiTimers.forEach(clearTimeout); aiTimers = [];
@@ -1751,7 +1821,7 @@ function palsMode(m) {
   const many = S.pals.length !== 1;
   $('pals-title').textContent = wait ? 'Continua il percorso' : look ? 'Le tue palette' : many ? 'Scegli la tua palette' : 'La tua palette';
   $('pals-sub').textContent = !ready ? ''
-    : VIEW ? 'Cerca questi colori nello showroom e toccali con mano.'
+    : VIEW ? `Cerca questi colori nello showroom e toccali con mano.${SCAN ? ' Alla fine del percorso qui arriva anche il tuo progetto.' : ''}`
     : wait ? 'Scopri nello showroom colori e materiali e toccali con mano.'
     : look ? 'Nate dalle tue scelte. Tra poco le vedrai dal vivo nello showroom.'
     : many ? `Puoi sceglierne una o tutte e ${S.pals.length === 3 ? 'tre' : 'due'}, e cambiarne i colori.` : 'Toccala per continuare.';
@@ -1789,7 +1859,7 @@ function showPalsQR() {
     if (mine !== session || step !== 'pals' || AI.palsMode !== 'qr') return clearInterval(t);
     try {
       const r = await (await fetch('api/scan?id=' + id)).json();
-      if (r.scanned && mine === session && AI.palsMode === 'qr') startWait();
+      if (r.scanned && mine === session && AI.palsMode === 'qr') { S.scan = id; startWait(); }
     } catch {}
   }, 1500);
   aiTimers.push(t);
@@ -1935,13 +2005,11 @@ $('pals-done').addEventListener('click', () => {
 
 // ── 7 · AI READING ──
 // The observations appear one by one while the AI draws the spaces of the
-// chosen palettes; "Vedi il tuo progetto" appears when they are drawn, or after
-// AI_MAX at most (the rest then lands in the proposal while it is open).
-const AI_MAX = 90000;
+// chosen palettes; "Vedi il tuo progetto" appears with the last one. The pictures
+// still being drawn land in the proposal while it is open.
 function runAI() {
   aiTimers.forEach(clearTimeout); aiTimers = [];
   AI.linesDone = false;
-  const t0 = performance.now();
   const ul = $('ai-lines'); ul.textContent = '';
   const sw = $('ai-swatches'), dots = sw.querySelectorAll('i');
   sw.classList.remove('done');
@@ -1957,19 +2025,17 @@ function runAI() {
     if (i < lines.length - 1) return;
     AI.linesDone = true;
     aiStatus(); maybeDone();
-    aiTimers.push(setTimeout(() => maybeDone(true), Math.max(0, AI_MAX - (performance.now() - t0))));
   }, 700 + i * 1100)));
 }
 function aiStatus() {
   const total = S.picks.length * SHOTS.length;
   $('ai-status').hidden = !AI.linesDone || !AI.pending;
-  $('ai-status').textContent = `Sto creando i tuoi ambienti · ${total - AI.pending} di ${total}`;
+  $('ai-status').textContent = `Le immagini arrivano mentre lo guardi · ${total - AI.pending} di ${total}`;
 }
-function maybeDone(force) {
-  if (step !== 'ai' || !AI.linesDone || !$('ai-done').hidden || (AI.pending && !force)) return;
+function maybeDone() {
+  if (step !== 'ai' || !AI.linesDone || !$('ai-done').hidden) return;
   $('ai-swatches').classList.add('done');
   $('ai-title').textContent = 'Il tuo progetto è pronto';
-  $('ai-status').hidden = true;
   $('ai-done').hidden = false;
 }
 $('ai-done').addEventListener('click', () => go('result'));
@@ -2024,6 +2090,11 @@ function renderResult() {
   fillShots();
   renderTry();
   $('result-scroll').scrollTop = 0;
+  // the phone that took the palettes gets the project too: its page switches to it by itself
+  if (S.scan && !S.shared) {
+    const mine = session;
+    api('scan', { id:S.scan, project:encode() }).then(() => { if (mine === session) toast('Il progetto è arrivato anche sul tuo telefono', 4000); }, () => {});
+  }
 }
 // The three strongest languages as one bar, each in its own accent colour
 // (colour as information), then two tiles: the space and the brand.
@@ -2232,8 +2303,9 @@ $('try-file').addEventListener('change', async e => {
 
 // ── SAVE & SHARE ──
 // The whole project fits in the URL: type, brand, scores, the pictures said
-// yes to, the chosen palettes as catalogue codes. No server, nothing stored
-// about the visitor — the phone that scans the QR rebuilds the proposal from
+// yes to, the chosen palettes as catalogue codes. Nothing about the visitor is
+// stored, except this same code for 30 minutes under the palettes' QR id, so the
+// phone that took the palettes can open it. The phone rebuilds the proposal from
 // the link (with the journey's photos: the AI pictures stay on the showroom screen).
 function encode() {
   return encodeURIComponent(JSON.stringify({
@@ -2269,7 +2341,6 @@ function decode(code) {
   brandPals();   // the same Sikkens products the showroom screen showed
   S.picks = S.pals.map((_, i) => i);
   S.prop = { name:String(d.n || p.name).slice(0, 40), description:`${ARCH[p.pk].desc} ${ARCH[p.sk].desc}` };
-  S.decisions = TOTAL;
   S.shared = true;
   return true;
 }
@@ -2292,7 +2363,7 @@ $('share-link').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText(url); toast('Link copiato'); } catch { toast('Copia non riuscita'); }
 });
 let toastT;
-function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 1800); }
+function toast(t, ms = 1800) { const el = $('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), ms); }
 
 // ── PROFILE SHEET ──
 $('profile-open').addEventListener('click', () => {
@@ -2346,24 +2417,24 @@ makeDismissable($('color-sheet'), $('color-grabber'));
 makeDismissable($('share-sheet'), $('share-grabber'));
 
 // ── RESTART ──
-const modal = $('restart-modal');
-function openModal() { modal.hidden = false; requestAnimationFrame(() => modal.classList.add('active')); }
-function closeModal() { modal.classList.remove('active'); setTimeout(() => { if (!modal.classList.contains('active')) modal.hidden = true; }, 300); }
+const modal = $('restart-modal'), idleModal = $('idle-modal');
+function openModal(m) { m.hidden = false; requestAnimationFrame(() => m.classList.add('active')); }
+function closeModal(m) { m.classList.remove('active'); setTimeout(() => { if (!m.classList.contains('active')) m.hidden = true; }, 300); }
 function reset() {
   aiTimers.forEach(clearTimeout);
   session++; typeBusy = deckBusy = abBusy = false;
-  closeModal(); closeSheets(); fresh(); aiReset();
+  closeModal(modal); closeSheets(); fresh(); aiReset();
   if (location.hash) history.replaceState(null, '', location.pathname + location.search);
   go('intro');
 }
-$('restart').addEventListener('click', openModal);
-$('restart-no').addEventListener('click', closeModal);
-$('restart-backdrop').addEventListener('click', closeModal);
+$('restart').addEventListener('click', () => openModal(modal));
+$('restart-no').addEventListener('click', () => closeModal(modal));
+$('restart-backdrop').addEventListener('click', () => closeModal(modal));
 $('restart-yes').addEventListener('click', reset);
 
 // ── KEYBOARD ──
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { if (!modal.hidden) closeModal(); else closeSheets(); return; }
+  if (e.key === 'Escape') { if (!modal.hidden) closeModal(modal); else closeSheets(); return; }
   if (step === 'explore' && modal.hidden) {
     if (e.key === 'ArrowRight') decide(2);
     else if (e.key === 'ArrowUp') decide(1);
@@ -2373,14 +2444,24 @@ document.addEventListener('keydown', e => {
 
 // ── KIOSK IDLE ──
 // On the showroom wall a walked-away session goes back to the attract screen,
-// so the next visitor never inherits someone else's choices. A link opened on
-// a phone is that person's own copy and never resets itself.
-let idleT;
+// so the next visitor never inherits someone else's choices. Before it does, a
+// countdown asks "Sei ancora qui?": someone still reading, or talking it over
+// with a consultant, keeps the session with one touch. A link opened on a phone
+// is that person's own copy and never resets itself.
+let idleT, idleTick;
 function bumpIdle() {
-  clearTimeout(idleT);
+  clearTimeout(idleT); clearInterval(idleTick);
+  if (!idleModal.hidden) closeModal(idleModal);
   if (S.shared || step === 'intro') return;
-  idleT = setTimeout(reset, step === 'pals' ? IDLE_MS * 3 : IDLE_MS);   // the palette step sends the visitor to the sample wall
+  const ms = step === 'pals' ? IDLE_MS * 3 : IDLE_MS;   // the palette step sends the visitor to the sample wall
+  idleT = setTimeout(() => {
+    let n = IDLE_WARN / 1000;
+    const say = () => { $('idle-text').textContent = `Tra ${n === 1 ? 'un secondo' : `${n} secondi`} si ricomincia da capo e le scelte fatte vengono cancellate.`; };
+    say(); openModal(idleModal);
+    idleTick = setInterval(() => { if (--n > 0) say(); else { clearInterval(idleTick); reset(); } }, 1000);
+  }, ms - IDLE_WARN);
 }
+$('idle-stay').addEventListener('click', bumpIdle);
 ['pointerdown', 'keydown', 'input'].forEach(ev => document.addEventListener(ev, bumpIdle, { passive:true }));
 
 // ── BOOT ──
@@ -2389,12 +2470,29 @@ function bumpIdle() {
 const m = location.hash.match(/^#p=(.+)$/), v = location.hash.match(/^#v=(.+)$/);
 if (m) catReady.then(() => go(decode(m[1]) ? 'result' : 'intro'));
 else if (v) {
-  const id = new URLSearchParams(location.search).get('scan');
-  if (id) fetch('api/scan', { method:'POST', headers:{ 'content-type':'application/json' }, body:JSON.stringify({ id }) }).catch(() => {});
+  if (SCAN) fetch('api/scan', { method:'POST', headers:{ 'content-type':'application/json' }, body:JSON.stringify({ id:SCAN }) }).catch(() => {});
   S.shared = true;
-  catReady.then(() => { S.pals = readPalsLink(v[1]); go(S.pals.length ? 'pals' : 'intro'); });
+  catReady.then(() => { S.pals = readPalsLink(v[1]); go(S.pals.length ? 'pals' : 'intro'); if (SCAN) awaitProject(); });
 }
 else go('intro');
+// The phone that took the palettes asks every few seconds whether the screen has
+// reached the project; when it has, the page turns into it, as if the final QR
+// had been scanned. The code is kept 30 minutes, so the asking stops after 20.
+function awaitProject() {
+  const t0 = Date.now();
+  const t = setInterval(async () => {
+    if (Date.now() - t0 > 20 * 60000) return clearInterval(t);
+    try {
+      const { project } = await (await fetch('api/scan?project=1&id=' + encodeURIComponent(SCAN))).json();
+      if (!project) return;
+      clearInterval(t);
+      if (!decode(project)) { S.shared = true; return; }   // a broken code: the palettes stay on screen as they are
+      history.replaceState(null, '', location.pathname + '#p=' + project);   // a reload keeps the project, and does not count a second scan
+      go('result');
+      toast('È arrivato il tuo progetto', 4000);
+    } catch {}   // a dropped check on a phone network: ask again
+  }, 5000);
+}
 </script>
 </body>
 </html>
