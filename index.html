@@ -171,31 +171,32 @@ img{display:block}
 .actions .btn-quiet+.btn-primary{flex:1 1 0;width:auto;min-width:0}
 
 /* ── INTRO / ATTRACT ──
-   One room whose walls change colour: the same photo repainted by the AI in six
-   Colour Wall colours, each new coat coming down the wall, the pill naming it.
-   Below, the copy on the amber light. FinishDecor colours throughout. */
+   One room whose walls change colour: the same photo in six Colour Wall colours,
+   each new coat coming down the wall.
+   Below, the copy on black; the room comes down behind its first line, to the floor. */
 .screen-intro{padding:0 1.5rem max(1.75rem, var(--safe-b))}
+/* the room runs on 7rem behind the copy: lower in the frame, so more wall shows above the
+   window, and the rug's edge and the floor slip behind the title. It fades out in its last
+   13rem, dark enough behind the welcome line for small text (6:1 or more, measured) */
 .room{
-  position:relative;flex:1 1 auto;min-height:0;margin:0 -1.5rem;overflow:hidden;
-  --fade:linear-gradient(to bottom,#000 0%,#000 46%,rgba(0,0,0,0.86) 58%,rgba(0,0,0,0.6) 70%,rgba(0,0,0,0.32) 81%,rgba(0,0,0,0.12) 91%,transparent 100%);
+  position:relative;flex:1 1 auto;min-height:0;margin:0 -1.5rem -7rem;overflow:hidden;
+  --fade:linear-gradient(to bottom,#000 0%,#000 calc(100% - 13rem),rgba(0,0,0,0.8) calc(100% - 10rem),rgba(0,0,0,0.5) calc(100% - 8.5rem),rgba(0,0,0,0.3) calc(100% - 7rem),rgba(0,0,0,0.18) calc(100% - 5.5rem),rgba(0,0,0,0.08) calc(100% - 3.5rem),transparent 100%);
   -webkit-mask-image:var(--fade);mask-image:var(--fade);
 }
-/* the room twice, one over the other: the next colour comes down the wall like a coat of paint */
-.room img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 72%;clip-path:inset(0 0 100% 0)}
+/* the room twice, one over the other: the next colour comes down the wall like a coat of paint.
+   Pinned to the bottom: the floor is the photo's last strip */
+.room img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 100%;clip-path:inset(0 0 100% 0)}
 .room img.in{clip-path:inset(0);transition:clip-path 1.8s cubic-bezier(.65,0,.35,1)}
 /* the logo sits on the photo; a soft dark veil from the top keeps it readable */
 .room::before{
   content:'';position:absolute;inset:0 0 auto;height:32%;z-index:3;pointer-events:none;
   background:linear-gradient(to bottom,rgba(18,18,18,0.82) 0%,rgba(18,18,18,0.5) 40%,rgba(18,18,18,0.16) 75%,transparent 100%);
 }
-.room-tag{position:absolute;z-index:4;left:1.5rem;top:calc(var(--safe-t) + 5.5rem);display:inline-flex;align-items:center;gap:0.625rem;padding:0.4375rem 1rem 0.4375rem 0.4375rem;border-radius:999px;background:var(--glass);border:1px solid var(--glass-line);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);font-size:0.9375rem;font-weight:500;line-height:1.2}
-.room-tag i{width:1.75rem;height:1.75rem;border-radius:50%;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0.85);transition:background .6s}
-.room-tag small{font-size:0.8125rem;font-weight:400;color:var(--label-2)}
 .intro-logo{position:absolute;z-index:2;top:calc(var(--safe-t) + 1.5rem);left:50%;transform:translateX(-50%);height:2.25rem;width:auto}
-/* the reference's light, in FinishDecor yellows only: brightest in the
-   bottom-right corner, falling through the brand amber and deeper ochres into
-   black towards the top-left. Blurred so it reads as light, not as stripes,
-   and masked at the top so it rises into the photo. */
+/* behind the glass palette cards, a quiet light in FinishDecor yellows only:
+   brightest in the bottom-right corner, falling through the brand amber and deeper
+   ochres into black towards the top-left. Blurred so it reads as light, not as
+   stripes, and masked at the top. The welcome has none: its room fades into black. */
 .intro-glow{
   position:absolute;left:-10%;right:-10%;bottom:-6%;height:84%;z-index:-1;pointer-events:none;
   background:
@@ -205,7 +206,6 @@ img{display:block}
   -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 32%);
   mask-image:linear-gradient(to bottom,transparent 0%,#000 32%);
 }
-/* the same warm light, quieter, behind the glass palette cards */
 .intro-glow.soft{opacity:0.45}
 .intro-meta,.intro-text,.intro-kicker{text-shadow:0 1px 12px rgba(0,0,0,0.28)}
 .intro-copy{position:relative;z-index:1}
@@ -791,9 +791,7 @@ img{display:block}
     <img class="intro-logo" src="logo-wordmark.webp" alt="FinishDecor" width="300" height="70">
     <div class="room" aria-hidden="true">
       <img id="room-a" class="in" alt=""><img id="room-b" alt="">
-      <p class="room-tag"><i id="room-dot"></i><span id="room-name"></span><small>Colour Wall Sikkens</small></p>
     </div>
-    <div class="intro-glow" aria-hidden="true"></div>
     <div class="intro-copy">
       <p class="intro-kicker">Benvenuto</p>
       <h2 class="intro-title">Il tuo stile, prima ancora del colore</h2>
@@ -1359,14 +1357,14 @@ function go(next) {
 }
 
 // ── 0 · INTRO: ONE ROOM, REPAINTED ──
-// The same room in six Colour Wall colours, repainted once by the AI (the room try,
-// api/repaint.js) and saved in assets/stanza/<n>.webp, in this order.
+// The same room in six Colour Wall colours, saved in assets/stanza/<n>.webp, in this order:
+// photo 1 from the AI (the room try, api/repaint.js), the others photo 1 with only the wall
+// re-tinted by tools/stanza-pareti.js, so the light and the furniture never move.
 const ROOM = [['Mild Sage', '#A3A793'], ['Mild Peony', '#C4A3AC'], ['Real Indigo', '#5A7589'], ['Mild Sienna', '#C57861'], ['Lush Forest', '#4E786E'], ['Real Olive', '#C8B079']];
 {
   const src = k => `assets/stanza/${k + 1}.webp`;
   let k = 0, top = $('room-a'), under = $('room-b');
-  const label = () => { $('room-dot').style.background = ROOM[k][1]; $('room-name').textContent = ROOM[k][0]; };
-  top.src = src(0); label();
+  top.src = src(0);
   ROOM.forEach((_, i) => { new Image().src = src(i); });   // all six in the cache before the first coat
   setInterval(() => {
     if (step !== 'intro' || document.hidden) return;
@@ -1377,7 +1375,7 @@ const ROOM = [['Mild Sage', '#A3A793'], ['Mild Peony', '#C4A3AC'], ['Real Indigo
     top.decode().catch(() => {}).then(() => {
       top.style.zIndex = 2; under.style.zIndex = 1;
       void top.offsetWidth;   // start from the clipped state, or the coat would not run
-      top.classList.add('in'); label();
+      top.classList.add('in');
     });
   }, 5000);
 }

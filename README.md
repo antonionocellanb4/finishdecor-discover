@@ -14,7 +14,7 @@ Un solo percorso. Se nello showroom ci sono due schermi, mostrano la stessa cosa
 
 | Fase | Cosa fa il cliente | Cosa raccoglie il sistema |
 |---|---|---|
-| 0 · Attract | Vede una stanza che cambia colore: ogni 5 secondi una nuova mano scende sulla parete, con il nome del colore della Colour Wall. Tocca un punto qualsiasi dello schermo (o "Inizia") | — |
+| 0 · Attract | Vede una stanza che cambia colore: ogni 5 secondi una nuova mano scende sulla parete, in un altro colore della Colour Wall. Tocca un punto qualsiasi dello schermo (o "Inizia") | — |
 | 1 · Ambiente | Sceglie lo spazio da una griglia alta quanto lo schermo: casa, hotel, ristorante, negozio, ufficio, business, wellness | la tipologia: decide le foto delle fasi 2 e 3 e cosa disegna l'AI |
 | 2 · Esplora | Prima una schermata spiega che dalle risposte nasce il suo profilo e mostra le tre risposte con i gesti; poi 16 immagini: le 8 della tipologia scelta alternate a 8 ispirazioni comuni (paesaggi, arte, architettura, materia). "Non fa per me", "Mi incuriosisce" o "Mi rappresenta", anche trascinando (sinistra, su, destra). "Annulla" riporta l'ultima foto | −1 / +1 / +3 ai linguaggi di ogni immagine |
 | 3 · Scegli | 6 confronti A oppure B, diversi per ogni tipologia. "Annulla" riporta l'ultimo confronto (dal primo, l'ultima foto di Esplora) | +3 ai linguaggi dell'ambiente scelto |
@@ -195,7 +195,7 @@ con i colori dell'app al posto della Colour Wall (il catalogo non si può legger
 
 Il resto è in `index.html`, nello script:
 
-- `ROOM` e `assets/stanza/` — la stanza della schermata iniziale: la stessa foto ridipinta una volta sola con l'AI della prova sulla stanza (`api/repaint.js`), un'immagine per colore, nello stesso ordine della lista.
+- `ROOM` e `assets/stanza/` — la stanza della schermata iniziale, un'immagine per colore, nello stesso ordine della lista. La foto 1 l'ha fatta l'AI della prova sulla stanza (`api/repaint.js`); le altre sono la stessa foto con la sola parete ritinta da `tools/stanza-pareti.js`, così luci, ombre e arredi restano identici e cambia solo il colore del muro. Per cambiare un colore: cambiatelo in `ROOM` e rifate le foto con quel file (istruzioni in testa), senza AI.
 - `ARCH` — i sette linguaggi: nome e descrizione. Le loro palette di 5 colori (base, supporto, accento, profondità, dettaglio) le compone la pagina dalla Colour Wall; quelle scritte qui valgono solo se il catalogo non si legge (pagina aperta da file).
 - `LANG_RULES` e `compose` — le regole dei linguaggi e delle palette (vedi "Il profilo: cosa è misurato").
 - `PRODUCTS` — le finiture suggerite per ogni linguaggio.
