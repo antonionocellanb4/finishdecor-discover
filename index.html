@@ -685,8 +685,10 @@ img{display:block}
 /* still being repainted: the photo as it is, with a light sweeping over it */
 .cmp.busy .cmp-before{clip-path:none}
 .cmp.busy .cmp-handle,.cmp.busy .cmp-dl,.cmp.busy .gen-tag.r{display:none}
-.cmp.busy::after,.try-tab.busy::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,0.16) 50%,transparent 65%) 0 0/300% 100%;animation:shimmer 1.6s linear infinite}
+.cmp.busy::after,.try-tab.busy::after,.try-ver.busy::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,0.16) 50%,transparent 65%) 0 0/300% 100%;animation:shimmer 1.6s linear infinite}
 .try-cap{display:flex;justify-content:space-between;gap:1rem;margin-top:0.625rem;font-size:0.875rem;color:var(--label-2)}
+.try-vers{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.875rem}
+.try-ver{position:relative;overflow:hidden}
 .try-tabs{display:flex;gap:0.625rem;margin-top:0.875rem}
 .try-tab{position:relative;flex:0 0 5.5rem;aspect-ratio:4/3;overflow:hidden;border-radius:var(--r-control);background:var(--surface)}
 .try-tab img{width:100%;height:100%;object-fit:cover}
@@ -764,7 +766,7 @@ img{display:block}
   .room img.in{transition:none}
   .g-move,.g-dot,.g-trail,.card.nudge,.deck-actions.demo .act,.howto-fan img{animation:none}
   .g-move,.g-dot{opacity:1}
-  .screen,.ai-lines li,.pal,.gen.busy,.fan i,.cmp.busy::after,.try-tab.busy::after{animation:none}
+  .screen,.ai-lines li,.pal,.gen.busy,.fan i,.cmp.busy::after,.try-tab.busy::after,.try-ver.busy::after{animation:none}
 }
 </style>
 </head>
@@ -915,7 +917,7 @@ img{display:block}
 
       <section class="r-pal" id="r-try" hidden>
         <h3 class="r-pal-name">Prova i colori sulla tua stanza</h3>
-        <p class="r-desc">Scatta o scegli una foto di una stanza: l'AI ne ridipinge le pareti con la palette che scegli. Puoi fare fino a 3 prove.</p>
+        <p class="r-desc">Scatta o scegli una foto di una stanza: l'AI ne ridipinge le pareti con la palette che scegli, in tre versioni. Puoi provare fino a 3 foto.</p>
         <div class="try-pals" id="try-pals"></div>
         <input type="file" accept="image/*" id="try-file" hidden>
         <p class="try-msg" id="try-msg" role="status" hidden></p>
@@ -933,6 +935,7 @@ img{display:block}
             </a>
           </div>
           <div class="try-cap"><span id="try-cap-pal"></span><span id="try-cap-n"></span></div>
+          <div class="try-vers" id="try-vers" aria-label="Versioni"></div>
           <div class="try-tabs" id="try-tabs"></div>
         </div>
       </section>
@@ -1763,7 +1766,7 @@ function brandPals() {
     const used = new Set();
     const colors = p.colors.map(c => { const n = nearest(c.hex, used); if (!n) return c; used.add(n); return { code:n.code, name:n.name, hex:n.hex }; });
     const own = prods.filter(x => x.linguaggi.includes(ARCH[p.key]?.label)).slice(0, 3)
-      .map((x, i) => ({ name:x.name, code:x.code, where:x.dove, why:x.note, color:[0, 2, 3][i] }));
+      .map((x, i) => ({ name:x.name, code:x.code, where:x.dove, why:x.note, color:[[0, 1], [2], [3, 4]][i] }));   // walls, accent, details: all five colours
     return { ...p, colors, products:own.length ? own : p.products };
   });
 }
@@ -2133,12 +2136,14 @@ function renderResult() {
     const ph = document.createElement('h4'); ph.className = 'r-h'; ph.textContent = 'Indicazioni di prodotto';
     const prods = document.createElement('div');
     pal.products.forEach(x => {
-      const c = pal.colors[x.color] || pal.colors[0];
+      const cs = [x.color].flat().map(j => pal.colors[j]).filter(Boolean);
+      if (!cs.length) cs.push(pal.colors[0]);
       const row = document.createElement('div'); row.className = 'prod';
-      const chip = document.createElement('div'); chip.className = 'prod-sw'; chip.style.background = c.hex;
+      const chip = document.createElement('div'); chip.className = 'prod-sw';
+      chip.style.background = cs.length > 1 ? `linear-gradient(${cs[0].hex} 50%, ${cs[1].hex} 50%)` : cs[0].hex;
       const body = document.createElement('div');
       const nm = document.createElement('div'); nm.className = 'prod-name'; nm.textContent = x.code ? `${x.name} · ${x.code}` : x.name;
-      const w = document.createElement('div'); w.className = 'prod-where'; w.textContent = `${x.where} · ${c.name}`;
+      const w = document.createElement('div'); w.className = 'prod-where'; w.textContent = `${x.where} · ${cs.map(c => c.name).join(' e ')}`;
       const t = document.createElement('div'); t.className = 'prod-note'; t.textContent = x.why;
       body.append(nm, w, t); row.append(chip, body); prods.appendChild(row);
     });
@@ -2227,11 +2232,14 @@ function putImg(g, src, alt) {
 // ── TRY IT ON YOUR ROOM (phone only) ──
 // From the project opened on the phone, a photo of the visitor's own room goes
 // to the AI (api/repaint.js), which repaints its walls with the palette they
-// pick: up to three tries, each one a before/after picture to download. On the
+// pick, in three versions: up to three photos, each a before/after picture to download. On the
 // phone the bottom button starts a try, since the project is already in hand
 // there; the showroom screen has no photos of the visitor and keeps its QR.
 const MAX_TRIES = 3;
-const tries = [];   // { pal, before, ratio, after }: after stays null while the AI paints
+// The three ways the AI uses the palette on one photo, with the colours each one puts on
+// the walls (0 base, 1 support, 2 accent, 3 depth): same order as SCHEMES in api/repaint.js
+const TRY_VERSIONS = [{ name:'Parete d\'accento', cols:[0, 2] }, { name:'Due toni', cols:[0, 3] }, { name:'Avvolgente', cols:[1] }];
+const tries = [];   // { pal, before, ratio, outs, v }: one picture per version, null while the AI paints, false if it failed; v the one shown
 let tryPal = 0, tryShown = 0, cmpX = 50;
 const tryMsg = t => { $('try-msg').textContent = t; $('try-msg').hidden = !t; };
 function renderTry() {
@@ -2256,7 +2264,7 @@ function renderTry() {
 }
 // What follows the tries: the bottom button, the big picture, the thumbnails
 function tryState() {
-  const busy = tries.some(t => !t.after), done = tries.length >= MAX_TRIES && !busy;
+  const busy = tries.some(t => t.outs.includes(null)), done = tries.length >= MAX_TRIES && !busy;
   const go = $('try-go');
   go.hidden = !S.shared || done;
   go.disabled = busy;
@@ -2266,43 +2274,66 @@ function tryState() {
   if (done) tryMsg('Hai fatto le 3 prove.');
   $('try-view').hidden = !tries.length;
   if (!tries.length) return;
-  const t = tries[tryShown], cmp = $('try-cmp'), key = tryShown + (t.after ? 'd' : 'b');
-  cmp.classList.toggle('busy', !t.after);
+  const t = tries[tryShown];
+  if (t.outs[t.v] === false) t.v = Math.max(0, t.outs.findIndex(o => o !== false));   // the version shown failed: the next one
+  const out = t.outs[t.v], cmp = $('try-cmp'), key = `${tryShown}.${t.v}${out ? 'd' : 'b'}`;
+  cmp.classList.toggle('busy', !out);
   cmp.style.aspectRatio = t.ratio;
   $('try-before').src = t.before;
-  $('try-after').hidden = !t.after;
-  if (t.after) { $('try-after').src = t.after; $('try-after').alt = `La tua stanza con la palette ${t.pal.name}`; $('try-dl').href = t.after; }
-  $('try-tag').textContent = t.after ? 'Prima' : 'In arrivo';
+  $('try-after').hidden = !out;
+  if (out) { $('try-after').src = out; $('try-after').alt = `La tua stanza con la palette ${t.pal.name}, versione ${TRY_VERSIONS[t.v].name}`; $('try-dl').href = out; }
+  $('try-tag').textContent = out ? 'Prima' : 'In arrivo';
   $('try-cap-pal').textContent = `Palette ${t.pal.name}`;
   $('try-cap-n').textContent = `Prova ${tryShown + 1} di ${MAX_TRIES}`;
   if (cmp.dataset.k !== key) { cmp.dataset.k = key; setCmp(50); }   // a new picture starts from the middle
+  const vers = $('try-vers');
+  vers.textContent = '';
+  TRY_VERSIONS.forEach((v, i) => {
+    if (t.outs[i] === false) return;
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'try-pal try-ver' + (t.outs[i] ? '' : ' busy');
+    b.setAttribute('aria-pressed', String(i === t.v));
+    const strip = document.createElement('span'); strip.className = 'try-strip';
+    v.cols.forEach(j => { const s = document.createElement('b'); s.style.background = (t.pal.colors[j] || t.pal.colors.at(-1)).hex; strip.appendChild(s); });
+    b.append(strip, v.name);
+    b.addEventListener('click', () => { t.v = i; tryState(); });
+    vers.appendChild(b);
+  });
   const tabs = $('try-tabs');
   tabs.textContent = '';
   tabs.hidden = tries.length < 2;
   tries.forEach((x, i) => {
     const b = document.createElement('button');
-    b.type = 'button'; b.className = 'try-tab' + (x.after ? '' : ' busy');
+    const shot = x.outs[x.v] || x.outs.find(Boolean);
+    b.type = 'button'; b.className = 'try-tab' + (shot ? '' : ' busy');
     b.setAttribute('aria-pressed', String(i === tryShown));
     b.setAttribute('aria-label', `Prova ${i + 1}, palette ${x.pal.name}`);
-    const im = document.createElement('img'); im.alt = ''; im.src = x.after || x.before;
+    const im = document.createElement('img'); im.alt = ''; im.src = shot || x.before;
     b.appendChild(im);
     b.addEventListener('click', () => { tryShown = i; tryState(); });
     tabs.appendChild(b);
   });
 }
-// The handle: dragged anywhere on the picture (a vertical swipe still scrolls the page), or the arrow keys
+// The handle: dragged anywhere on the picture (a vertical swipe still scrolls the page), tapped
+// where it should go, or the arrow keys. A finger goes through touch events, kept from scrolling
+// once it moves sideways: a pointer drag gets cancelled the moment the phone starts to scroll.
 function setCmp(x) {
   cmpX = clamp(x, 0, 100);
   $('try-cmp').style.setProperty('--x', cmpX + '%');
   $('try-handle').setAttribute('aria-valuenow', String(Math.round(cmpX)));
 }
-$('try-cmp').addEventListener('pointerdown', e => { if (!e.target.closest('.cmp-dl')) e.currentTarget.setPointerCapture(e.pointerId); });
-$('try-cmp').addEventListener('pointermove', e => {
-  const c = e.currentTarget;
-  if (!c.hasPointerCapture(e.pointerId) || c.classList.contains('busy')) return;
-  const r = c.getBoundingClientRect();
-  setCmp((e.clientX - r.left) / r.width * 100);
-});
+const cmpAt = x => { const c = $('try-cmp'), r = c.getBoundingClientRect(); if (!c.classList.contains('busy')) setCmp((x - r.left) / r.width * 100); };
+$('try-cmp').addEventListener('pointerdown', e => { if (e.pointerType !== 'touch' && !e.target.closest('.cmp-dl')) e.currentTarget.setPointerCapture(e.pointerId); });
+$('try-cmp').addEventListener('pointermove', e => { if (e.pointerType !== 'touch' && e.currentTarget.hasPointerCapture(e.pointerId)) cmpAt(e.clientX); });   // a finger is captured by itself
+$('try-cmp').addEventListener('click', e => { if (!e.target.closest('.cmp-dl')) cmpAt(e.clientX); });
+let finger = null;   // { x, y, side }: side is decided by the first move, sideways or not
+$('try-cmp').addEventListener('touchstart', e => { const t = e.touches[0]; finger = e.touches.length === 1 ? { x:t.clientX, y:t.clientY, side:null } : null; }, { passive:true });
+$('try-cmp').addEventListener('touchmove', e => {
+  if (!finger) return;
+  const t = e.touches[0];
+  finger.side ??= Math.abs(t.clientX - finger.x) > Math.abs(t.clientY - finger.y);
+  if (finger.side) { e.preventDefault(); cmpAt(t.clientX); }
+}, { passive:false });
 $('try-handle').addEventListener('keydown', e => {
   const d = { ArrowLeft:-5, ArrowRight:5 }[e.key];
   if (d) { e.preventDefault(); setCmp(cmpX + d); }
@@ -2329,35 +2360,41 @@ $('try-go').addEventListener('click', () => $('try-file').click());
 $('try-file').addEventListener('change', async e => {
   const file = e.target.files[0];
   e.target.value = '';   // the same photo can be picked again
-  if (!file || tries.length >= MAX_TRIES || tries.some(t => !t.after)) return;
+  if (!file || tries.length >= MAX_TRIES || tries.some(t => t.outs.includes(null))) return;
   tryMsg('');
   let photo;
   try { photo = await shrink(file); } catch { tryMsg('Non riesco a leggere questa foto: prova con un\'altra.'); return; }
-  const t = { pal:S.pals[tryPal], before:photo.data, ratio:photo.ratio, after:null };
+  const t = { pal:S.pals[tryPal], before:photo.data, ratio:photo.ratio, outs:TRY_VERSIONS.map(() => null), v:0 };
   tries.push(t); tryShown = tries.length - 1; tryState();
   $('r-try').scrollIntoView({ behavior:'smooth', block:'start' });
+  const drop = msg => { tries.splice(tries.indexOf(t), 1); tryShown = Math.max(0, tries.length - 1); tryState(); tryMsg(msg); };
+  let ids;
   try {
-    const { id } = await api('repaint', { image:photo.data, ratio:photo.ratio, palette:t.pal.colors.map(c => ({ name:c.name, hex:c.hex })) });
-    for (let n = 0; n < 60; n++) {   // a check every 3 s, three minutes at most
-      await new Promise(r => setTimeout(r, 3000));
-      const r = await fetch('api/repaint?id=' + encodeURIComponent(id)).then(x => x.json()).catch(() => ({}));   // a dropped check on a phone network: ask again
-      if (r.error) throw new Error(r.error);
-      if (!r.image) continue;
-      await new Promise(ok => { const i = new Image(); i.onload = i.onerror = ok; i.src = r.image; });   // shown once it has arrived
-      t.after = r.image;
-      tryState();
-      return;
-    }
-    throw new Error('tempo scaduto');
+    ({ ids } = await api('repaint', { image:photo.data, ratio:photo.ratio, palette:t.pal.colors.map(c => ({ name:c.name, hex:c.hex })) }));
   } catch (err) {
-    tries.splice(tries.indexOf(t), 1);
-    tryShown = Math.max(0, tries.length - 1);
-    tryState();
-    tryMsg(/COMFY_API_KEY/.test(err.message) ? 'La prova sulla tua stanza non è ancora attiva.'
+    return drop(/COMFY_API_KEY/.test(err.message) ? 'La prova sulla tua stanza non è ancora attiva.'
       : /Troppe prove|Limite di oggi/.test(err.message) ? 'Per ora le prove sono finite: riprova più tardi.'
       : 'Non è riuscita: riprova tra poco.');
   }
+  // each version shows up as soon as it is ready; one that fails just drops out
+  await Promise.all(t.outs.map(async (_, i) => {
+    try { t.outs[i] = await painted(ids?.[i]); } catch { t.outs[i] = false; }
+    tryState();
+  }));
+  if (!t.outs.some(Boolean)) drop('Non è riuscita: riprova tra poco.');
 });
+async function painted(id) {
+  if (!id) throw new Error('nessun lavoro');
+  for (let n = 0; n < 60; n++) {   // a check every 3 s, three minutes at most
+    await new Promise(r => setTimeout(r, 3000));
+    const r = await fetch('api/repaint?id=' + encodeURIComponent(id)).then(x => x.json()).catch(() => ({}));   // a dropped check on a phone network: ask again
+    if (r.error) throw new Error(r.error);
+    if (!r.image) continue;
+    await new Promise(ok => { const i = new Image(); i.onload = i.onerror = ok; i.src = r.image; });   // shown once it has arrived
+    return r.image;
+  }
+  throw new Error('tempo scaduto');
+}
 
 // ── SAVE & SHARE ──
 // The whole project fits in the URL: type, brand, scores, the pictures said

@@ -210,7 +210,7 @@ const COLOUR_WALL = [
 // effetti decorativi e uno smalto. Nomi e descrizioni sono quelli del sito; la
 // scelta di quali proporre per ogni linguaggio è nostra. La pagina prende i primi
 // tre del linguaggio della palette, nell'ordine di questa lista, e li abbina ai
-// colori 1 (pareti), 3 (accento) e 4 (dettagli): l'ordine conta.
+// colori 1 e 2 (pareti), 3 (accento), 4 e 5 (dettagli): l'ordine conta.
 const PRODOTTI = [
   { code: '', name: 'Alphacryl SF',      dove: 'Pareti di tutti gli ambienti',      note: 'Idropittura lavabile e coprente, senza solventi e a basse emissioni',      linguaggi: ['Neutro', 'Minimale'] },
   { code: '', name: 'Alpha Tex Acryl',   dove: 'Pareti di tutti gli ambienti',      note: 'Idropittura traspirante, con certificazioni ambientali CAM ed EPD',         linguaggi: ['Naturale'] },

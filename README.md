@@ -34,7 +34,7 @@ Vercel → Storage: aggiunge `KV_REST_API_URL` e `KV_REST_API_TOKEN`); senza
 archivio resta in memoria, che basta col server locale sul PC dello showroom.
 Nello stesso archivio stanno i limiti delle chiamate a pagamento (`limit` in
 `api/_ai.js`): proposta 30 l'ora per visitatore e 200 al giorno, immagini 120
-l'ora e 1200 al giorno, prova sulla stanza 12 l'ora e 200 al giorno.
+l'ora e 1200 al giorno, prova sulla stanza 12 foto l'ora e 200 al giorno (ogni foto, tre versioni).
 Per provarlo col telefono in locale apri la pagina
 dall'indirizzo di rete del PC (es. `http://192.168.1.20:8137`), non da `localhost`,
 con telefono e PC sulla stessa rete.
@@ -62,10 +62,13 @@ quando un telefono ha inquadrato il QR delle palette (vedi "Un solo QR").
 **Prova i colori sulla tua stanza.** Nel progetto aperto sul telefono il bottone
 in basso non è più "Porta a casa il progetto" (il progetto è già lì) ma "Prova
 sulla tua stanza": si sceglie la palette, si scatta o si sceglie una foto di una
-stanza e l'AI ne ridipinge le pareti (pareti principali nel primo colore, una
-parete d'accento nel terzo; il resto della foto resta com'è). Fino a 3 prove:
-ognuna è un prima/dopo con il cursore da trascinare e l'icona per scaricarla, e
-le miniature passano da una prova all'altra. Sul monitor dello showroom la
+stanza e l'AI ne ridipinge le pareti in tre versioni insieme (`SCHEMES` in
+`api/repaint.js`, `TRY_VERSIONS` nella pagina): parete d'accento (pareti nel primo
+colore, una parete nel terzo), due toni (parte bassa nel quarto, alta nel primo) e
+avvolgente (tutte le pareti nel secondo); il resto della foto resta com'è. Fino a 3
+foto: ognuna è un prima/dopo con il cursore da trascinare (o un tocco dove serve) e
+l'icona per scaricarla, i bottoni sotto passano da una versione all'altra e le
+miniature da una foto all'altra. Sul monitor dello showroom la
 sezione non c'è: le foto della persona stanno sul suo telefono.
 
 Per questo il QR funziona solo se l'app è pubblicata su un indirizzo vero
@@ -150,7 +153,7 @@ Funzioni server in `api/` (più `api/scan.js` per il QR delle palette), che Verc
 |---|---|---|
 | `api/proposal.js` | dopo il linguaggio | scrive profilo, osservazioni e il nome e la frase delle **tre palette**, che compone la pagina (vedi "Il profilo: cosa è misurato"), con Google Gemini su Comfy Cloud |
 | `api/room.js` | dopo la scelta delle palette | per ogni palette scelta disegna tre spazi diversi della tipologia e un moodboard, con Nano Banana su Comfy Cloud (circa 15 s a immagine) |
-| `api/repaint.js` | sul telefono, "Prova i colori sulla tua stanza" | carica la foto su **Comfy Cloud** e ne ridipinge le pareti con **GPT Image 2** (stesso nodo e stessa chiave di ManyTask e LeadWin). Circa 40 secondi: la pagina chiede ogni 3 s se è pronta |
+| `api/repaint.js` | sul telefono, "Prova i colori sulla tua stanza" | carica la foto su **Comfy Cloud** e ne ridipinge le pareti con **GPT Image 2.6** in tre versioni (stessa chiave di ManyTask e LeadWin). Circa 40 secondi: la pagina chiede ogni 3 s se sono pronte. I limiti contano le foto, non le versioni |
 
 - **Una sola chiave, mai nella pagina.** Tutta l'AI passa da Comfy Cloud con
   `COMFY_API_KEY`: in locale nel file `.env` (copia `.env.example`), online
